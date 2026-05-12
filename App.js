@@ -633,7 +633,20 @@ export default function App() {
     const isMemberLogin = pin === '170120' && members.includes(name);
 
     if (!isAdminLogin && !isMemberLogin) {
-      Alert.alert('Error', 'Invalid name or PIN');
+      // Provide specific error message
+      let errorMsg = 'Invalid name or PIN';
+
+      if (pin === '1701202026') {
+        errorMsg = 'Incorrect name. Admin name is "Jose"';
+      } else if (pin === '170120') {
+        errorMsg = `"${name}" is not a member or name is incorrect`;
+      } else if (name === 'Jose') {
+        errorMsg = 'Incorrect admin PIN';
+      } else if (members.includes(name)) {
+        errorMsg = 'Incorrect PIN';
+      }
+
+      Alert.alert('Login Failed', errorMsg);
       return;
     }
 
