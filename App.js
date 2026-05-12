@@ -788,8 +788,8 @@ export default function App() {
         </View>
 
         <ScrollView style={styles.tableContainer} scrollEventThrottle={16}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={true}>
-            <View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={true} contentContainerStyle={{ minWidth: '100%' }}>
+            <View style={{ width: '100%' }}>
               {/* Header row with date/meal and member names */}
               <View style={styles.memberHeaderRow}>
                 <View style={[styles.headerCell, styles.dateHeaderCell]}>
@@ -933,28 +933,28 @@ const styles = StyleSheet.create({
   headerButtonsGroup: { flexDirection: 'row', gap: 12 },
   summaryBtn: { backgroundColor: COLORS.white, borderRadius: 12, padding: 12, paddingHorizontal: 20, shadowColor: COLORS.dark, shadowOpacity: 0.15, shadowRadius: 8, elevation: 4 },
   summaryBtnText: { fontSize: 14, fontWeight: '800', color: COLORS.dark, textAlign: 'center' },
-  tableWrapper: { flex: 1, backgroundColor: '#FFFFFF', flexDirection: 'column' },
-  tableContainer: { flex: 1, backgroundColor: '#FFFFFF' },
+  tableWrapper: { flex: 1, backgroundColor: '#FFFFFF', flexDirection: 'column', width: '100%' },
+  tableContainer: { flex: 1, backgroundColor: '#FFFFFF', width: '100%' },
   memberHeaderRow: { flexDirection: 'row', borderBottomWidth: 3, borderBottomColor: COLORS.primary, backgroundColor: '#F0F0F0' },
   headerCell: { padding: 8, justifyContent: 'center', alignItems: 'center', borderRightWidth: 1, borderRightColor: COLORS.muted },
-  dateHeaderCell: { width: 70, minHeight: 60 },
-  mealTypeHeaderCell: { width: 60, minHeight: 60 },
-  memberHeaderCell: { width: 80, minHeight: 60 },
-  headerText: { fontSize: 12, fontWeight: '700', color: COLORS.dark },
-  memberHeaderText: { fontSize: 12, fontWeight: '700', color: COLORS.dark, textAlign: 'center' },
-  dietaryBadge: { fontSize: 9, color: COLORS.warning, marginTop: 2 },
+  dateHeaderCell: { width: 90, minHeight: 60, flexShrink: 0 },
+  mealTypeHeaderCell: { width: 50, minHeight: 60, flexShrink: 0 },
+  memberHeaderCell: { flex: 1, minHeight: 60 },
+  headerText: { fontSize: 11, fontWeight: '700', color: COLORS.dark },
+  memberHeaderText: { fontSize: 10, fontWeight: '700', color: COLORS.dark, textAlign: 'center' },
+  dietaryBadge: { fontSize: 8, color: COLORS.warning, marginTop: 2 },
   dateGroup: {},
   dateRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
   dinnerRow: { backgroundColor: '#F8F8F8' },
-  cell: { padding: 6, justifyContent: 'center', alignItems: 'center', borderRightWidth: 1, borderRightColor: COLORS.light },
-  dateCell: { width: 70, minHeight: 40, alignItems: 'center', justifyContent: 'center' },
-  dateCellTop: { minHeight: 80, borderBottomWidth: 0 },
+  cell: { padding: 4, justifyContent: 'center', alignItems: 'center', borderRightWidth: 1, borderRightColor: COLORS.light },
+  dateCell: { width: 90, minHeight: 40, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  dateCellTop: { minHeight: 40, borderBottomWidth: 0 },
   dateCellBottom: { minHeight: 40, borderTopWidth: 0 },
-  mealTypeCell: { width: 60, minHeight: 40, alignItems: 'center' },
-  mealCell: { width: 80, minHeight: 40, justifyContent: 'center', alignItems: 'center' },
+  mealTypeCell: { width: 50, minHeight: 40, alignItems: 'center', flexShrink: 0 },
+  mealCell: { flex: 1, minHeight: 40, justifyContent: 'center', alignItems: 'center' },
   dateText: { fontSize: 11, fontWeight: '600', color: COLORS.dark },
   mealTypeText: { fontSize: 11, fontWeight: '600', color: COLORS.muted },
-  mealButton: { width: 60, height: 40, borderRadius: 10, justifyContent: 'center', alignItems: 'center', borderWidth: 0, shadowColor: COLORS.dark, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
+  mealButton: { width: '100%', height: 40, borderRadius: 10, justifyContent: 'center', alignItems: 'center', borderWidth: 0, shadowColor: COLORS.dark, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
   mealButtonText: { fontSize: 14, fontWeight: '800', lineHeight: 14, color: COLORS.white },
   legend: { padding: 12, textAlign: 'center', fontSize: 11, color: COLORS.muted, backgroundColor: COLORS.light, borderTopWidth: 1, borderTopColor: COLORS.light },
   header: { alignItems: 'center', marginBottom: 40 },
