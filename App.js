@@ -12,13 +12,13 @@ function MealCell({ state, onPress, canEdit = true }) {
   const getDisplay = () => {
     switch (state) {
       case 'none':
-        return { icon: '', bg: canEdit ? '#f5f5f5' : '#e8e8e8', text: '#999' };
+        return { icon: '', bg: canEdit ? COLORS.light : COLORS.muted, text: COLORS.muted };
       case 'attending':
-        return { icon: '✓', bg: '#4CAF50', text: '#fff' };
+        return { icon: '✓', bg: COLORS.success, text: COLORS.white };
       case 'attending+container':
-        return { icon: '✓\n+\n🍱', bg: '#2196F3', text: '#fff' };
+        return { icon: '✓\n+\n🍱', bg: COLORS.secondary, text: COLORS.white };
       default:
-        return { icon: '', bg: canEdit ? '#f5f5f5' : '#e8e8e8', text: '#999' };
+        return { icon: '', bg: canEdit ? COLORS.light : COLORS.muted, text: COLORS.muted };
     }
   };
 
@@ -447,7 +447,7 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
                             styles.barSegment,
                             {
                               height: (normal / maxValue) * chartHeight,
-                              backgroundColor: '#4CAF50',
+                              backgroundColor: COLORS.secondary,
                             },
                           ]}
                         >
@@ -460,7 +460,7 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
                             styles.barSegment,
                             {
                               height: (vegetarian / maxValue) * chartHeight,
-                              backgroundColor: '#8BC34A',
+                              backgroundColor: COLORS.accent,
                             },
                           ]}
                         >
@@ -481,11 +481,11 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
         <View style={styles.statsCard}>
           <Text style={styles.statsTitle}>Legend</Text>
           <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: '#4CAF50' }]} />
+            <View style={[styles.legendColor, { backgroundColor: COLORS.secondary }]} />
             <Text style={styles.legendText}>Normal portions</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: '#8BC34A' }]} />
+            <View style={[styles.legendColor, { backgroundColor: COLORS.accent }]} />
             <Text style={styles.legendText}>Vegetarian portions</Text>
           </View>
           <Text style={styles.legendNote}>Note: Containers are included in their respective diet type</Text>
@@ -859,13 +859,15 @@ export default function App() {
 
       <View style={styles.card}>
         <Text style={styles.label}>Your Name</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your name"
-          value={name}
-          onChangeText={setName}
-          editable={!loading}
-        />
+        <View style={styles.pinContainer}>
+          <TextInput
+            style={[styles.input, { flex: 1 }]}
+            placeholder="Enter your name"
+            value={name}
+            onChangeText={setName}
+            editable={!loading}
+          />
+        </View>
 
         <Text style={styles.label}>PIN</Text>
         <View style={styles.pinContainer}>
@@ -900,104 +902,104 @@ export default function App() {
 
 // Typeform-inspired color palette
 const COLORS = {
-  primary: '#0C51B3',      // Bold blue
-  secondary: '#00D9FF',    // Cyan
-  accent: '#FF006E',       // Vibrant pink
-  success: '#06D6A0',      // Teal green
-  warning: '#FFB703',      // Warm orange
-  light: '#F7FAFC',        // Almost white
+  primary: '#000000',      // Black
+  secondary: '#0070F3',    // Strong blue
+  accent: '#FF0080',       // Pink
+  success: '#0080FF',      // Bright blue
+  warning: '#F5A623',      // Orange
+  light: '#FAFAFA',        // Almost white
   white: '#FFFFFF',
-  dark: '#1a202c',
-  muted: '#718096',        // Gray
+  dark: '#000000',
+  muted: '#999999',        // Gray
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.light },
   scrollContent: { padding: 24, justifyContent: 'center', minHeight: '100%' },
   scheduleContainer: { flex: 1, backgroundColor: COLORS.light },
-  scheduleHeader: { background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)`, padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, shadowColor: COLORS.primary, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 16, elevation: 8 },
-  scheduleTitle: { fontSize: 32, fontWeight: 'bold', color: COLORS.white, letterSpacing: -0.5 },
-  scheduleSubtitle: { fontSize: 16, color: COLORS.secondary, marginTop: 8, fontWeight: '500' },
+  scheduleHeader: { backgroundColor: COLORS.white, padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, shadowColor: COLORS.dark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
+  scheduleTitle: { fontSize: 32, fontWeight: 'bold', color: COLORS.dark, letterSpacing: -0.5 },
+  scheduleSubtitle: { fontSize: 16, color: COLORS.muted, marginTop: 8, fontWeight: '500' },
   headerButtonsGroup: { flexDirection: 'row', gap: 12 },
-  summaryBtn: { backgroundColor: COLORS.white, borderRadius: 12, padding: 12, paddingHorizontal: 20, shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 8, elevation: 4 },
-  summaryBtnText: { fontSize: 14, fontWeight: '800', color: COLORS.primary, textAlign: 'center' },
-  tableWrapper: { flex: 1, backgroundColor: '#fff', flexDirection: 'column' },
-  tableContainer: { flex: 1, backgroundColor: '#fff' },
-  memberHeaderRow: { flexDirection: 'row', borderBottomWidth: 3, borderBottomColor: COLORS.primary, backgroundColor: '#f9f9f9' },
-  headerCell: { padding: 8, justifyContent: 'center', alignItems: 'center', borderRightWidth: 1, borderRightColor: '#ddd' },
+  summaryBtn: { backgroundColor: COLORS.white, borderRadius: 12, padding: 12, paddingHorizontal: 20, shadowColor: COLORS.dark, shadowOpacity: 0.15, shadowRadius: 8, elevation: 4 },
+  summaryBtnText: { fontSize: 14, fontWeight: '800', color: COLORS.dark, textAlign: 'center' },
+  tableWrapper: { flex: 1, backgroundColor: '#FFFFFF', flexDirection: 'column' },
+  tableContainer: { flex: 1, backgroundColor: '#FFFFFF' },
+  memberHeaderRow: { flexDirection: 'row', borderBottomWidth: 3, borderBottomColor: COLORS.primary, backgroundColor: '#F0F0F0' },
+  headerCell: { padding: 8, justifyContent: 'center', alignItems: 'center', borderRightWidth: 1, borderRightColor: COLORS.muted },
   dateHeaderCell: { width: 70, minHeight: 60 },
   mealTypeHeaderCell: { width: 60, minHeight: 60 },
   memberHeaderCell: { width: 80, minHeight: 60 },
-  headerText: { fontSize: 12, fontWeight: '700', color: '#333' },
-  memberHeaderText: { fontSize: 12, fontWeight: '700', color: '#333', textAlign: 'center' },
-  dietaryBadge: { fontSize: 9, color: '#ff9800', marginTop: 2 },
+  headerText: { fontSize: 12, fontWeight: '700', color: COLORS.dark },
+  memberHeaderText: { fontSize: 12, fontWeight: '700', color: COLORS.dark, textAlign: 'center' },
+  dietaryBadge: { fontSize: 9, color: COLORS.warning, marginTop: 2 },
   dateGroup: {},
-  dateRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#eee' },
-  dinnerRow: { backgroundColor: '#fafafa' },
-  cell: { padding: 6, justifyContent: 'center', alignItems: 'center', borderRightWidth: 1, borderRightColor: '#eee' },
+  dateRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
+  dinnerRow: { backgroundColor: '#F8F8F8' },
+  cell: { padding: 6, justifyContent: 'center', alignItems: 'center', borderRightWidth: 1, borderRightColor: COLORS.light },
   dateCell: { width: 70, minHeight: 40, alignItems: 'center', justifyContent: 'center' },
   dateCellTop: { minHeight: 80, borderBottomWidth: 0 },
   dateCellBottom: { minHeight: 40, borderTopWidth: 0 },
   mealTypeCell: { width: 60, minHeight: 40, alignItems: 'center' },
   mealCell: { width: 80, minHeight: 40, justifyContent: 'center', alignItems: 'center' },
-  dateText: { fontSize: 11, fontWeight: '600', color: '#333' },
-  mealTypeText: { fontSize: 11, fontWeight: '600', color: '#666' },
-  mealButton: { width: 60, height: 40, borderRadius: 10, justifyContent: 'center', alignItems: 'center', borderWidth: 0, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
-  mealButtonText: { fontSize: 14, fontWeight: '800', lineHeight: 14, color: '#fff' },
-  legend: { padding: 12, textAlign: 'center', fontSize: 11, color: '#666', backgroundColor: '#f9f9f9', borderTopWidth: 1, borderTopColor: '#eee' },
+  dateText: { fontSize: 11, fontWeight: '600', color: COLORS.dark },
+  mealTypeText: { fontSize: 11, fontWeight: '600', color: COLORS.muted },
+  mealButton: { width: 60, height: 40, borderRadius: 10, justifyContent: 'center', alignItems: 'center', borderWidth: 0, shadowColor: COLORS.dark, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
+  mealButtonText: { fontSize: 14, fontWeight: '800', lineHeight: 14, color: COLORS.white },
+  legend: { padding: 12, textAlign: 'center', fontSize: 11, color: COLORS.muted, backgroundColor: COLORS.light, borderTopWidth: 1, borderTopColor: COLORS.light },
   header: { alignItems: 'center', marginBottom: 40 },
   title: { fontSize: 32, fontWeight: 'bold', marginBottom: 8 },
-  subtitle: { fontSize: 16, color: '#666' },
-  card: { backgroundColor: COLORS.white, borderRadius: 16, padding: 32, marginBottom: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 3 },
+  subtitle: { fontSize: 16, color: COLORS.muted },
+  card: { backgroundColor: COLORS.white, borderRadius: 16, padding: 32, marginBottom: 24, shadowColor: COLORS.dark, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 3 },
   label: { fontSize: 13, fontWeight: '700', color: COLORS.dark, marginTop: 20, marginBottom: 12, textTransform: 'uppercase', letterSpacing: 1 },
   input: { borderWidth: 2, borderColor: COLORS.light, borderRadius: 12, padding: 14, fontSize: 16, backgroundColor: COLORS.light, color: COLORS.dark, fontWeight: '500' },
-  pinContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#ddd', borderRadius: 8 },
+  pinContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: COLORS.muted, borderRadius: 8 },
   eyeBtn: { padding: 12 },
-  toggleContainer: { flexDirection: 'row', backgroundColor: '#f0f0f0', borderRadius: 8, padding: 4 },
+  toggleContainer: { flexDirection: 'row', backgroundColor: COLORS.light, borderRadius: 8, padding: 4 },
   toggleBtn: { flex: 1, padding: 10, alignItems: 'center', borderRadius: 6 },
-  toggleBtnActive: { backgroundColor: '#4CAF50' },
-  toggleText: { fontSize: 14, fontWeight: '600', color: '#666' },
-  toggleTextActive: { color: '#fff' },
-  helperText: { fontSize: 12, color: '#999', marginTop: 8, fontStyle: 'italic' },
-  loginBtn: { background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)`, borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 32, shadowColor: COLORS.primary, shadowOpacity: 0.3, shadowRadius: 12, elevation: 4 },
+  toggleBtnActive: { backgroundColor: COLORS.success },
+  toggleText: { fontSize: 14, fontWeight: '600', color: COLORS.muted },
+  toggleTextActive: { color: COLORS.white },
+  helperText: { fontSize: 12, color: COLORS.muted, marginTop: 8, fontStyle: 'italic' },
+  loginBtn: { backgroundColor: COLORS.secondary, borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 32, shadowColor: COLORS.secondary, shadowOpacity: 0.2, shadowRadius: 8, elevation: 3 },
   loginBtnDisabled: { backgroundColor: COLORS.muted, shadowOpacity: 0 },
   loginBtnText: { fontSize: 18, fontWeight: '700', color: COLORS.white, letterSpacing: 0.5 },
   logoutBtn: { backgroundColor: COLORS.accent, borderRadius: 12, padding: 12, paddingHorizontal: 20, shadowColor: COLORS.accent, shadowOpacity: 0.2, shadowRadius: 8, elevation: 3 },
   logoutBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
   dashboardContainer: { flex: 1, backgroundColor: COLORS.light },
-  dashboardHeader: { background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)`, padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, shadowColor: COLORS.primary, shadowOpacity: 0.15, shadowRadius: 16, elevation: 8 },
-  dashboardTitle: { fontSize: 32, fontWeight: 'bold', color: COLORS.white, letterSpacing: -0.5 },
-  backButton: { fontSize: 16, fontWeight: '700', color: COLORS.white },
+  dashboardHeader: { backgroundColor: COLORS.white, padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, shadowColor: COLORS.dark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
+  dashboardTitle: { fontSize: 32, fontWeight: 'bold', color: COLORS.dark, letterSpacing: -0.5 },
+  backButton: { fontSize: 16, fontWeight: '700', color: COLORS.secondary },
   dashboardContent: { flex: 1, padding: 24 },
-  filterCard: { backgroundColor: COLORS.white, borderRadius: 16, padding: 24, marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 12, elevation: 2 },
+  filterCard: { backgroundColor: COLORS.white, borderRadius: 16, padding: 24, marginBottom: 20, shadowColor: COLORS.dark, shadowOpacity: 0.08, shadowRadius: 12, elevation: 2 },
   filterTitle: { fontSize: 18, fontWeight: '700', color: COLORS.dark, marginBottom: 16 },
   filterGroup: { marginBottom: 12 },
-  filterLabel: { fontSize: 13, fontWeight: '600', color: '#666', marginBottom: 8 },
+  filterLabel: { fontSize: 13, fontWeight: '600', color: COLORS.muted, marginBottom: 8 },
   filterButtonGroup: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   filterButton: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: COLORS.light, borderWidth: 2, borderColor: COLORS.light },
   filterButtonActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   filterButtonText: { fontSize: 13, fontWeight: '700', color: COLORS.muted },
   filterButtonTextActive: { color: COLORS.white },
-  chartCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2 },
-  chartTitle: { fontSize: 16, fontWeight: '700', color: '#333', marginBottom: 12 },
+  chartCard: { backgroundColor: COLORS.white, borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2 },
+  chartTitle: { fontSize: 16, fontWeight: '700', color: COLORS.dark, marginBottom: 12 },
   customChart: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', height: 250, paddingVertical: 16 },
   chartBar: { alignItems: 'center', flex: 1 },
   barStack: { width: 30, flexDirection: 'column-reverse', borderRadius: 4, overflow: 'hidden' },
   barSegment: { width: '100%', justifyContent: 'center', alignItems: 'center' },
-  barLabel: { fontSize: 10, fontWeight: 'bold', color: '#fff' },
-  monthLabel: { fontSize: 11, fontWeight: '600', color: '#666', marginTop: 8 },
-  noDataText: { fontSize: 14, color: '#999', textAlign: 'center', paddingVertical: 20 },
-  statsCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, elevation: 2 },
-  statsTitle: { fontSize: 16, fontWeight: '700', color: '#333', marginBottom: 12 },
+  barLabel: { fontSize: 10, fontWeight: 'bold', color: COLORS.white },
+  monthLabel: { fontSize: 11, fontWeight: '600', color: COLORS.muted, marginTop: 8 },
+  noDataText: { fontSize: 14, color: COLORS.muted, textAlign: 'center', paddingVertical: 20 },
+  statsCard: { backgroundColor: COLORS.white, borderRadius: 12, padding: 16, elevation: 2 },
+  statsTitle: { fontSize: 16, fontWeight: '700', color: COLORS.dark, marginBottom: 12 },
   legendItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   legendColor: { width: 16, height: 16, borderRadius: 2, marginRight: 8 },
-  legendText: { fontSize: 14, color: '#666' },
-  legendNote: { fontSize: 12, color: '#999', marginTop: 8, fontStyle: 'italic' },
+  legendText: { fontSize: 14, color: COLORS.muted },
+  legendNote: { fontSize: 12, color: COLORS.muted, marginTop: 8, fontStyle: 'italic' },
   managementContainer: { flex: 1, backgroundColor: COLORS.light },
-  managementHeader: { background: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.secondary} 100%)`, padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, shadowColor: COLORS.primary, shadowOpacity: 0.15, shadowRadius: 16, elevation: 8 },
-  managementTitle: { fontSize: 32, fontWeight: 'bold', color: COLORS.white, letterSpacing: -0.5 },
+  managementHeader: { backgroundColor: COLORS.white, padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, shadowColor: COLORS.dark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
+  managementTitle: { fontSize: 32, fontWeight: 'bold', color: COLORS.dark, letterSpacing: -0.5 },
   managementContent: { flex: 1, padding: 24 },
-  addMemberCard: { backgroundColor: COLORS.white, borderRadius: 16, padding: 24, marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 12, elevation: 2 },
+  addMemberCard: { backgroundColor: COLORS.white, borderRadius: 16, padding: 24, marginBottom: 20, shadowColor: COLORS.dark, shadowOpacity: 0.08, shadowRadius: 12, elevation: 2 },
   addMemberTitle: { fontSize: 18, fontWeight: '700', color: COLORS.dark, marginBottom: 16 },
   dietaryOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 },
   dietaryOption: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, backgroundColor: COLORS.light, borderWidth: 2, borderColor: COLORS.light },
@@ -1006,16 +1008,16 @@ const styles = StyleSheet.create({
   dietaryOptionTextActive: { color: COLORS.white },
   addButton: { backgroundColor: COLORS.success, borderRadius: 12, padding: 14, alignItems: 'center', shadowColor: COLORS.success, shadowOpacity: 0.2, shadowRadius: 8, elevation: 3 },
   addButtonText: { fontSize: 16, fontWeight: '700', color: COLORS.white, letterSpacing: 0.5 },
-  membersListCard: { backgroundColor: COLORS.white, borderRadius: 16, padding: 24, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 12, elevation: 2 },
+  membersListCard: { backgroundColor: COLORS.white, borderRadius: 16, padding: 24, shadowColor: COLORS.dark, shadowOpacity: 0.08, shadowRadius: 12, elevation: 2 },
   membersListTitle: { fontSize: 18, fontWeight: '700', color: COLORS.dark, marginBottom: 16 },
-  memberItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#eee', paddingRight: 8 },
+  memberItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: COLORS.light, paddingRight: 8 },
   memberInfo: { flex: 1, marginRight: 8 },
-  memberName: { fontSize: 14, fontWeight: '600', color: '#333' },
-  memberDietary: { fontSize: 12, color: '#666', marginTop: 2 },
+  memberName: { fontSize: 14, fontWeight: '600', color: COLORS.dark },
+  memberDietary: { fontSize: 12, color: COLORS.muted, marginTop: 2 },
   removeButton: { paddingHorizontal: 16, paddingVertical: 12, minWidth: 40, alignItems: 'center' },
   removeButtonText: { fontSize: 18, fontWeight: 'bold', color: COLORS.accent },
   confirmationOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
-  confirmationBox: { backgroundColor: COLORS.white, borderRadius: 16, padding: 28, width: '80%', maxWidth: 320, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 16, elevation: 5 },
+  confirmationBox: { backgroundColor: COLORS.white, borderRadius: 16, padding: 28, width: '80%', maxWidth: 320, shadowColor: COLORS.dark, shadowOpacity: 0.2, shadowRadius: 16, elevation: 5 },
   confirmationTitle: { fontSize: 18, fontWeight: '700', color: COLORS.dark, marginBottom: 12 },
   confirmationText: { fontSize: 14, color: COLORS.muted, marginBottom: 24, lineHeight: 20 },
   confirmationButtons: { flexDirection: 'row', gap: 12 },
@@ -1024,29 +1026,29 @@ const styles = StyleSheet.create({
   cancelButtonText: { fontSize: 14, fontWeight: '700', color: COLORS.dark },
   removeConfirmButton: { backgroundColor: COLORS.accent },
   removeConfirmButtonText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
-  dropdownButton: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 6, backgroundColor: '#f0f0f0', borderWidth: 1, borderColor: '#ddd' },
-  dropdownButtonText: { fontSize: 14, fontWeight: '600', color: '#333', flex: 1 },
-  dropdownArrow: { fontSize: 12, color: '#666', marginLeft: 8 },
-  dropdownMenu: { marginTop: 4, backgroundColor: '#fff', borderRadius: 6, borderWidth: 1, borderColor: '#ddd', maxHeight: 300, zIndex: 100 },
-  dropdownItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#eee' },
-  checkbox: { width: 18, height: 18, borderRadius: 3, borderWidth: 1, borderColor: '#ddd', marginRight: 8, justifyContent: 'center', alignItems: 'center' },
-  checkboxActive: { backgroundColor: '#4CAF50', borderColor: '#4CAF50' },
-  checkmark: { fontSize: 12, color: '#fff', fontWeight: 'bold' },
-  dropdownItemText: { fontSize: 13, color: '#333' },
-  settingsContainer: { flex: 1, backgroundColor: '#f5f5f5' },
-  settingsHeader: { backgroundColor: '#4CAF50', padding: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 20 },
-  settingsTitle: { fontSize: 24, fontWeight: 'bold', color: '#fff' },
+  dropdownButton: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 6, backgroundColor: COLORS.light, borderWidth: 1, borderColor: COLORS.muted },
+  dropdownButtonText: { fontSize: 14, fontWeight: '600', color: COLORS.dark, flex: 1 },
+  dropdownArrow: { fontSize: 12, color: COLORS.muted, marginLeft: 8 },
+  dropdownMenu: { marginTop: 4, backgroundColor: COLORS.white, borderRadius: 6, borderWidth: 1, borderColor: COLORS.muted, maxHeight: 300, zIndex: 100 },
+  dropdownItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: COLORS.light },
+  checkbox: { width: 18, height: 18, borderRadius: 3, borderWidth: 1, borderColor: COLORS.muted, marginRight: 8, justifyContent: 'center', alignItems: 'center' },
+  checkboxActive: { backgroundColor: COLORS.success, borderColor: COLORS.success },
+  checkmark: { fontSize: 12, color: COLORS.white, fontWeight: 'bold' },
+  dropdownItemText: { fontSize: 13, color: COLORS.dark },
+  settingsContainer: { flex: 1, backgroundColor: COLORS.light },
+  settingsHeader: { backgroundColor: COLORS.primary, padding: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 20 },
+  settingsTitle: { fontSize: 24, fontWeight: 'bold', color: COLORS.white },
   settingsContent: { flex: 1, padding: 16 },
-  settingsCard: { backgroundColor: '#fff', borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2 },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#333', marginBottom: 12 },
-  settingItem: { marginBottom: 16, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: '#eee' },
-  settingLabel: { fontSize: 12, fontWeight: '600', color: '#999', marginBottom: 4 },
-  settingValue: { fontSize: 16, fontWeight: '600', color: '#333' },
-  infoText: { fontSize: 14, color: '#666', marginBottom: 8, lineHeight: 20 },
-  infoLabel: { fontSize: 13, fontWeight: '700', color: '#333', marginBottom: 8, marginTop: 8 },
-  infoBullet: { fontSize: 13, color: '#666', marginBottom: 6, lineHeight: 18 },
-  infoBulletNested: { fontSize: 12, color: '#666', marginBottom: 4, marginLeft: 12, lineHeight: 16 },
-  divider: { height: 1, backgroundColor: '#eee', marginVertical: 12 },
+  settingsCard: { backgroundColor: COLORS.white, borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2 },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: COLORS.dark, marginBottom: 12 },
+  settingItem: { marginBottom: 16, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: COLORS.light },
+  settingLabel: { fontSize: 12, fontWeight: '600', color: COLORS.muted, marginBottom: 4 },
+  settingValue: { fontSize: 16, fontWeight: '600', color: COLORS.dark },
+  infoText: { fontSize: 14, color: COLORS.muted, marginBottom: 8, lineHeight: 20 },
+  infoLabel: { fontSize: 13, fontWeight: '700', color: COLORS.dark, marginBottom: 8, marginTop: 8 },
+  infoBullet: { fontSize: 13, color: COLORS.muted, marginBottom: 6, lineHeight: 18 },
+  infoBulletNested: { fontSize: 12, color: COLORS.muted, marginBottom: 4, marginLeft: 12, lineHeight: 16 },
+  divider: { height: 1, backgroundColor: COLORS.light, marginVertical: 12 },
   sectionLabel: { fontSize: 16, fontWeight: '700', color: '#333', marginBottom: 16 },
   secondaryBtn: { backgroundColor: '#f0f0f0', borderRadius: 8, padding: 14, alignItems: 'center', borderWidth: 1, borderColor: '#ddd' },
   secondaryBtnText: { fontSize: 14, fontWeight: '700', color: '#666' },
