@@ -630,7 +630,7 @@ export default function App() {
     }
 
     // Check admin credentials
-    const isAdminLogin = name === 'Jose' && pin === '1701202026';
+    const isAdminLogin = name === 'José García' && pin === '1701202026';
 
     // Check member credentials
     const isMemberLogin = pin === '170120' && members.includes(name);
@@ -693,6 +693,39 @@ export default function App() {
     const key = `${dateStr}-${member}-${mealType}`;
     return meals[key] || 'none';
   };
+
+  const getDietarySummary = (dateStr, mealType) => {
+    const summary = { Normal: 0, Vegetarian: 0, Container: 0 };
+    members.forEach(member => {
+      const key = `${dateStr}-${member}-${mealType}`;
+      const state = meals[key];
+      if (state === 'attending' || state === 'attending+container') {
+        const diet = memberDietary[member] || 'Normal';
+        summary[diet]++;
+        if (state === 'attending+container') {
+          summary.Container++;
+        }
+      }
+    });
+    const parts = [];
+    if (summary.Normal > 0) parts.push(`${summary.Normal} normal`);
+    if (summary.Vegetarian > 0) parts.push(`${summary.Vegetarian} vegetarian`);
+    if (summary.Container > 0) parts.push(`${summary.Container} lunchbox`);
+    return parts.join(' + ') || 'None';
+  };
+
+  const sortedMembers = useMemo(() => {
+    if (!members || members.length === 0) return members;
+
+    const sorted = [...members];
+    // Always put the current logged-in member first
+    const currentIndex = sorted.findIndex(m => m === currentMember);
+    if (currentIndex !== -1 && currentIndex !== 0) {
+      const current = sorted.splice(currentIndex, 1);
+      sorted.unshift(current[0]);
+    }
+    return sorted;
+  }, [members, currentMember]);
 
   const cycleMealState = (dateStr, member, mealType) => {
     // Enforce permission: only admins or the member themselves can edit
@@ -798,11 +831,14 @@ export default function App() {
                 <View style={[styles.headerCell, styles.mealTypeHeaderCell]}>
                   <Text style={styles.headerText}>Meal</Text>
                 </View>
-                {members.map(member => (
+                {sortedMembers.map(member => (
                   <View key={member} style={[styles.headerCell, styles.memberHeaderCell]}>
                     <Text style={styles.memberHeaderText}>{member}</Text>
                   </View>
                 ))}
+                <View style={[styles.headerCell, styles.summaryHeaderCell]}>
+                  <Text style={styles.headerText}>Summary</Text>
+                </View>
               </View>
 
               {/* Date rows with lunch and dinner */}
@@ -816,7 +852,7 @@ export default function App() {
                     <View style={[styles.cell, styles.mealTypeCell]}>
                       <Text style={styles.mealTypeText}>Lunch</Text>
                     </View>
-                    {members.map(member => (
+                    {sortedMembers.map(member => (
                       <View key={`${date}-${member}-lunch`} style={[styles.cell, styles.mealCell]}>
                         <MealCell
                           state={getMealState(date, member, 'lunch')}
@@ -825,6 +861,9 @@ export default function App() {
                         />
                       </View>
                     ))}
+                    <View style={[styles.cell, styles.summaryCell]}>
+                      <Text style={styles.summaryText}>{getDietarySummary(date, 'lunch')}</Text>
+                    </View>
                   </View>
 
                   {/* Dinner row */}
@@ -833,7 +872,7 @@ export default function App() {
                     <View style={[styles.cell, styles.mealTypeCell]}>
                       <Text style={styles.mealTypeText}>Dinner</Text>
                     </View>
-                    {members.map(member => (
+                    {sortedMembers.map(member => (
                       <View key={`${date}-${member}-dinner`} style={[styles.cell, styles.mealCell]}>
                         <MealCell
                           state={getMealState(date, member, 'dinner')}
@@ -842,6 +881,9 @@ export default function App() {
                         />
                       </View>
                     ))}
+                    <View style={[styles.cell, styles.summaryCell]}>
+                      <Text style={styles.summaryText}>{getDietarySummary(date, 'dinner')}</Text>
+                    </View>
                   </View>
                 </View>
               ))}
@@ -956,6 +998,9 @@ const styles = StyleSheet.create({
   mealTypeText: { fontSize: 11, fontWeight: '600', color: COLORS.muted },
   mealButton: { width: '100%', height: 40, borderRadius: 10, justifyContent: 'center', alignItems: 'center', borderWidth: 0, shadowColor: COLORS.dark, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
   mealButtonText: { fontSize: 14, fontWeight: '800', lineHeight: 14, color: COLORS.white },
+  summaryHeaderCell: { width: 120, minHeight: 60, flexShrink: 0 },
+  summaryCell: { width: 120, minHeight: 40, justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
+  summaryText: { fontSize: 10, fontWeight: '600', color: COLORS.dark, textAlign: 'center' },
   legend: { padding: 12, textAlign: 'center', fontSize: 11, color: COLORS.muted, backgroundColor: COLORS.light, borderTopWidth: 1, borderTopColor: COLORS.light },
   header: { alignItems: 'center', marginBottom: 40 },
   title: { fontSize: 32, fontWeight: 'bold', marginBottom: 8 },
