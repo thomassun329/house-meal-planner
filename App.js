@@ -509,6 +509,7 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentMember, setCurrentMember] = useState('');
   const [currentScreen, setCurrentScreen] = useState('schedule'); // 'schedule', 'dashboard', 'members', or 'settings'
+  const [loginError, setLoginError] = useState('');
   const autoLoginAttemptedRef = useRef(false);
 
   // Local state (synced from Firebase)
@@ -617,12 +618,14 @@ export default function App() {
   });
 
   const handleLogin = async () => {
+    setLoginError('');
+
     if (!name.trim()) {
-      Alert.alert('Error', 'Please enter your name');
+      setLoginError('Please enter your name');
       return;
     }
     if (!pin) {
-      Alert.alert('Error', 'Please enter your PIN');
+      setLoginError('Please enter your PIN');
       return;
     }
 
@@ -633,10 +636,11 @@ export default function App() {
     const isMemberLogin = pin === '170120' && members.includes(name);
 
     if (!isAdminLogin && !isMemberLogin) {
-      Alert.alert('Login Failed', 'Either name or PIN is incorrect');
+      setLoginError('Either name or PIN is incorrect');
       return;
     }
 
+    setLoginError('');
     setLoading(true);
     setTimeout(() => {
       setCurrentMember(name);
@@ -886,6 +890,12 @@ export default function App() {
           </TouchableOpacity>
         </View>
 
+        {loginError ? (
+          <View style={styles.errorBox}>
+            <Text style={styles.errorText}>⚠️ {loginError}</Text>
+          </View>
+        ) : null}
+
         <TouchableOpacity
           style={[styles.loginBtn, loading && styles.loginBtnDisabled]}
           onPress={handleLogin}
@@ -955,6 +965,8 @@ const styles = StyleSheet.create({
   input: { borderWidth: 2, borderColor: COLORS.light, borderRadius: 12, padding: 14, fontSize: 16, backgroundColor: COLORS.light, color: COLORS.dark, fontWeight: '500' },
   pinContainer: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: COLORS.muted, borderRadius: 8 },
   eyeBtn: { padding: 12 },
+  errorBox: { backgroundColor: '#FFE5E5', borderRadius: 12, padding: 14, marginBottom: 16, borderLeftWidth: 4, borderLeftColor: '#FF4444' },
+  errorText: { fontSize: 14, fontWeight: '600', color: '#CC0000' },
   toggleContainer: { flexDirection: 'row', backgroundColor: COLORS.light, borderRadius: 8, padding: 4 },
   toggleBtn: { flex: 1, padding: 10, alignItems: 'center', borderRadius: 6 },
   toggleBtnActive: { backgroundColor: COLORS.success },
