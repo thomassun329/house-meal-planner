@@ -1,4 +1,4 @@
-const CACHE_NAME = 'feldmark-v1';
+const CACHE_NAME = 'house-meal-planner-v1';
 const urlsToCache = [
   '/',
   '/index.html',

@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Dimensions, Modal } from 'react-native';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useFirebaseMeals, useFirebaseMembers, useFirebaseHousehold } from './useFirebase';
 
@@ -185,7 +185,12 @@ function MemberManagement({ members, memberDietary, onAddMember, onRemoveMember,
         </View>
 
         {/* Confirmation Modal */}
-        {removingMember && (
+        <Modal
+          visible={!!removingMember}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setRemovingMember(null)}
+        >
           <View style={styles.confirmationOverlay}>
             <View style={styles.confirmationBox}>
               <Text style={styles.confirmationTitle}>Remove Member?</Text>
@@ -209,7 +214,7 @@ function MemberManagement({ members, memberDietary, onAddMember, onRemoveMember,
               </View>
             </View>
           </View>
-        )}
+        </Modal>
       </ScrollView>
     </View>
   );
@@ -429,49 +434,52 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
         <View style={styles.chartCard}>
           <Text style={styles.chartTitle}>Monthly Portions</Text>
           {chartData.labels.length > 0 ? (
-            <View style={styles.customChart}>
-              {chartData.labels.map((label, idx) => {
-                const month = monthLabels[idx];
-                const normal = monthlyStats[month].normal;
-                const vegetarian = monthlyStats[month].vegetarian;
-                const container = monthlyStats[month].container;
-                const total = normal + vegetarian + container;
-                const chartHeight = total > 0 ? 200 : 50;
+            <View>
+              <View style={styles.customChart}>
+                {chartData.labels.map((label, idx) => {
+                  const month = monthLabels[idx];
+                  const normal = monthlyStats[month].normal;
+                  const vegetarian = monthlyStats[month].vegetarian;
+                  const total = normal + vegetarian;
+                  const normH = total > 0 ? (normal / maxValue) * 200 : 0;
+                  const vegH  = total > 0 ? (vegetarian / maxValue) * 200 : 0;
 
-                return (
-                  <View key={idx} style={styles.chartBar}>
-                    <View style={styles.barStack}>
-                      {normal > 0 && (
-                        <View
-                          style={[
-                            styles.barSegment,
-                            {
-                              height: (normal / maxValue) * chartHeight,
-                              backgroundColor: COLORS.secondary,
-                            },
-                          ]}
-                        >
-                          <Text style={styles.barLabel}>{normal}</Text>
-                        </View>
-                      )}
-                      {vegetarian > 0 && (
-                        <View
-                          style={[
-                            styles.barSegment,
-                            {
-                              height: (vegetarian / maxValue) * chartHeight,
-                              backgroundColor: COLORS.accent,
-                            },
-                          ]}
-                        >
-                          <Text style={styles.barLabel}>{vegetarian}</Text>
-                        </View>
-                      )}
+                  return (
+                    <View key={idx} style={styles.chartBarCol}>
+                      <Text style={styles.barTotalLabel}>{total > 0 ? total : ' '}</Text>
+                      <View style={styles.barStack}>
+                        {total === 0 ? (
+                          <View style={styles.barFallow} />
+                        ) : (
+                          <>
+                            {vegetarian > 0 && (
+                              <View style={[styles.barSegment, {
+                                height: vegH,
+                                backgroundColor: COLORS.success,
+                                borderTopLeftRadius: 5,
+                                borderTopRightRadius: 5,
+                              }]} />
+                            )}
+                            {normal > 0 && (
+                              <View style={[styles.barSegment, {
+                                height: normH,
+                                backgroundColor: COLORS.secondary,
+                                ...(vegetarian === 0 && { borderTopLeftRadius: 5, borderTopRightRadius: 5 }),
+                              }]} />
+                            )}
+                          </>
+                        )}
+                      </View>
                     </View>
-                    <Text style={styles.monthLabel}>{label}</Text>
-                  </View>
-                );
-              })}
+                  );
+                })}
+              </View>
+              <View style={styles.chartBaseline} />
+              <View style={styles.chartLabelsRow}>
+                {chartData.labels.map((label, idx) => (
+                  <Text key={idx} style={[styles.monthLabel, { flex: 1, textAlign: 'center' }]}>{label}</Text>
+                ))}
+              </View>
             </View>
           ) : (
             <Text style={styles.noDataText}>No data available</Text>
@@ -485,7 +493,7 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
             <Text style={styles.legendText}>Normal portions</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendColor, { backgroundColor: COLORS.accent }]} />
+            <View style={[styles.legendColor, { backgroundColor: COLORS.success }]} />
             <Text style={styles.legendText}>Vegetarian portions</Text>
           </View>
           <Text style={styles.legendNote}>Note: Containers are included in their respective diet type</Text>
@@ -803,16 +811,16 @@ export default function App() {
           <View style={styles.headerButtonsGroup}>
             {isAdmin && (
               <>
-                <TouchableOpacity style={styles.summaryBtn} onPress={() => setCurrentScreen('dashboard')}>
-                  <Text style={styles.summaryBtnText}>Dashboard</Text>
+                <TouchableOpacity style={styles.adminNavBtn} onPress={() => setCurrentScreen('dashboard')}>
+                  <Text style={styles.adminNavBtnText}>Dashboard</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.summaryBtn} onPress={() => setCurrentScreen('members')}>
-                  <Text style={styles.summaryBtnText}>Members</Text>
+                <TouchableOpacity style={styles.adminNavBtn} onPress={() => setCurrentScreen('members')}>
+                  <Text style={styles.adminNavBtnText}>Members</Text>
                 </TouchableOpacity>
               </>
             )}
-            <TouchableOpacity style={styles.summaryBtn} onPress={() => setCurrentScreen('settings')}>
-              <Text style={styles.summaryBtnText}>Settings</Text>
+            <TouchableOpacity style={styles.settingsNavBtn} onPress={() => setCurrentScreen('settings')}>
+              <Text style={styles.settingsNavBtnText}>⚙</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
               <Text style={styles.logoutBtnText}>Logout</Text>
@@ -891,35 +899,42 @@ export default function App() {
           </ScrollView>
         </ScrollView>
 
-        <Text style={styles.legend}>None → ✓ → ✓+🍱 (Cycle through by tapping)</Text>
+        <Text style={styles.legend}>⬜ None  →  ✓ Attending  →  ✓+🍱 With lunchbox  — tap to cycle</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      <View style={styles.header}>
-        <Text style={styles.title}>🏠 House Meal Planner</Text>
-        <Text style={styles.subtitle}>Coordinate household meals</Text>
+    <View style={styles.loginRoot}>
+      <View style={styles.loginHero}>
+        <Text style={styles.loginHeroEmoji}>🏠</Text>
+        <Text style={styles.loginHeroTitle}>House Meal Planner</Text>
+        <Text style={styles.loginHeroSubtitle}>Coordinate household meals</Text>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>Your Name</Text>
-        <View style={styles.pinContainer}>
-          <TextInput
-            style={[styles.input, { flex: 1 }]}
-            placeholder="Enter your name"
-            value={name}
-            onChangeText={setName}
-            editable={!loading}
-          />
-        </View>
+      <ScrollView
+        style={styles.loginFormPanel}
+        contentContainerStyle={styles.loginFormContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={styles.loginCardHeading}>Welcome back</Text>
 
-        <Text style={styles.label}>PIN</Text>
-        <View style={styles.pinContainer}>
+        <Text style={styles.loginFieldLabel}>Your Name</Text>
+        <TextInput
+          style={styles.loginTextInput}
+          placeholder="Enter your name"
+          placeholderTextColor={COLORS.muted}
+          value={name}
+          onChangeText={setName}
+          editable={!loading}
+        />
+
+        <Text style={styles.loginFieldLabel}>PIN</Text>
+        <View style={styles.loginPinWrapper}>
           <TextInput
-            style={[styles.input, { flex: 1 }]}
+            style={styles.loginPinInput}
             placeholder="Enter PIN"
+            placeholderTextColor={COLORS.muted}
             value={pin}
             onChangeText={setPin}
             keyboardType="number-pad"
@@ -927,8 +942,8 @@ export default function App() {
             editable={!loading}
             maxLength={20}
           />
-          <TouchableOpacity onPress={() => setShowPin(!showPin)} disabled={loading} style={styles.eyeBtn}>
-            <Text>{showPin ? '👁️' : '👁️‍🗨️'}</Text>
+          <TouchableOpacity onPress={() => setShowPin(!showPin)} disabled={loading} style={styles.loginEyeBtn}>
+            <Text style={styles.loginEyeIcon}>{showPin ? '👁️' : '🔒'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -945,24 +960,24 @@ export default function App() {
         >
           <Text style={styles.loginBtnText}>{loading ? 'Logging in...' : 'Login'}</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
 
-      <StatusBar style="dark" />
-    </ScrollView>
+      <StatusBar style="light" />
+    </View>
   );
 }
 
-// Typeform-inspired color palette
+// Botanical Garden–influenced palette: blue brand, fresh green for food/attending, warm muted
 const COLORS = {
   primary: '#000000',      // Black
-  secondary: '#0070F3',    // Strong blue
-  accent: '#FF0080',       // Pink
-  success: '#0080FF',      // Bright blue
-  warning: '#F5A623',      // Orange
-  light: '#FAFAFA',        // Almost white
+  secondary: '#0070F3',    // Brand blue
+  accent: '#FF0080',       // Pink (logout / remove)
+  success: '#22C55E',      // Fresh green (attending meal)
+  warning: '#F5A623',      // Amber
+  light: '#FAFAFA',        // Near-white surface
   white: '#FFFFFF',
-  dark: '#000000',
-  muted: '#999999',        // Gray
+  dark: '#111111',         // Near-black text
+  muted: '#888888',        // Warm gray
 };
 
 const styles = StyleSheet.create({
@@ -1001,7 +1016,7 @@ const styles = StyleSheet.create({
   summaryHeaderCell: { width: 120, minHeight: 60, flexShrink: 0 },
   summaryCell: { width: 120, minHeight: 40, justifyContent: 'center', alignItems: 'center', flexShrink: 0 },
   summaryText: { fontSize: 10, fontWeight: '600', color: COLORS.dark, textAlign: 'center' },
-  legend: { padding: 12, textAlign: 'center', fontSize: 11, color: COLORS.muted, backgroundColor: COLORS.light, borderTopWidth: 1, borderTopColor: COLORS.light },
+  legend: { padding: 14, textAlign: 'center', fontSize: 12, color: COLORS.dark, backgroundColor: COLORS.white, borderTopWidth: 1, borderTopColor: '#D0D0D0', fontWeight: '600', letterSpacing: 0.2 },
   header: { alignItems: 'center', marginBottom: 40 },
   title: { fontSize: 32, fontWeight: 'bold', marginBottom: 8 },
   subtitle: { fontSize: 16, color: COLORS.muted },
@@ -1021,7 +1036,7 @@ const styles = StyleSheet.create({
   loginBtn: { backgroundColor: COLORS.secondary, borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 32, shadowColor: COLORS.secondary, shadowOpacity: 0.2, shadowRadius: 8, elevation: 3 },
   loginBtnDisabled: { backgroundColor: COLORS.muted, shadowOpacity: 0 },
   loginBtnText: { fontSize: 18, fontWeight: '700', color: COLORS.white, letterSpacing: 0.5 },
-  logoutBtn: { backgroundColor: COLORS.accent, borderRadius: 12, padding: 12, paddingHorizontal: 20, shadowColor: COLORS.accent, shadowOpacity: 0.2, shadowRadius: 8, elevation: 3 },
+  logoutBtn: { backgroundColor: COLORS.accent, borderRadius: 12, height: 44, paddingHorizontal: 20, justifyContent: 'center', alignItems: 'center', shadowColor: COLORS.accent, shadowOpacity: 0.2, shadowRadius: 8, elevation: 3 },
   logoutBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
   dashboardContainer: { flex: 1, backgroundColor: COLORS.light },
   dashboardHeader: { backgroundColor: COLORS.white, padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, shadowColor: COLORS.dark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
@@ -1039,11 +1054,16 @@ const styles = StyleSheet.create({
   filterButtonTextActive: { color: COLORS.white },
   chartCard: { backgroundColor: COLORS.white, borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2 },
   chartTitle: { fontSize: 16, fontWeight: '700', color: COLORS.dark, marginBottom: 12 },
-  customChart: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', height: 250, paddingVertical: 16 },
+  customChart: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', height: 230, paddingTop: 24, paddingBottom: 0 },
   chartBar: { alignItems: 'center', flex: 1 },
-  barStack: { width: 30, flexDirection: 'column-reverse', borderRadius: 4, overflow: 'hidden' },
-  barSegment: { width: '100%', justifyContent: 'center', alignItems: 'center' },
+  chartBarCol: { alignItems: 'center', flex: 1 },
+  barStack: { width: 28, flexDirection: 'column-reverse' },
+  barSegment: { width: '100%' },
   barLabel: { fontSize: 10, fontWeight: 'bold', color: COLORS.white },
+  barTotalLabel: { fontSize: 8, fontWeight: '700', color: COLORS.dark, marginBottom: 3 },
+  barFallow: { width: '100%', height: 5, backgroundColor: '#E4E4E2', borderRadius: 2 },
+  chartBaseline: { height: 1.5, backgroundColor: COLORS.dark, marginTop: 0 },
+  chartLabelsRow: { flexDirection: 'row', justifyContent: 'space-around', paddingTop: 8, paddingBottom: 2 },
   monthLabel: { fontSize: 11, fontWeight: '600', color: COLORS.muted, marginTop: 8 },
   noDataText: { fontSize: 14, color: COLORS.muted, textAlign: 'center', paddingVertical: 20 },
   statsCard: { backgroundColor: COLORS.white, borderRadius: 12, padding: 16, elevation: 2 },
@@ -1093,8 +1113,8 @@ const styles = StyleSheet.create({
   checkmark: { fontSize: 12, color: COLORS.white, fontWeight: 'bold' },
   dropdownItemText: { fontSize: 13, color: COLORS.dark },
   settingsContainer: { flex: 1, backgroundColor: COLORS.light },
-  settingsHeader: { backgroundColor: COLORS.primary, padding: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 20 },
-  settingsTitle: { fontSize: 24, fontWeight: 'bold', color: COLORS.white },
+  settingsHeader: { backgroundColor: COLORS.white, padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, shadowColor: COLORS.dark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
+  settingsTitle: { fontSize: 28, fontWeight: 'bold', color: COLORS.dark, letterSpacing: -0.5 },
   settingsContent: { flex: 1, padding: 16 },
   settingsCard: { backgroundColor: COLORS.white, borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2 },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: COLORS.dark, marginBottom: 12 },
@@ -1109,4 +1129,24 @@ const styles = StyleSheet.create({
   sectionLabel: { fontSize: 16, fontWeight: '700', color: '#333', marginBottom: 16 },
   secondaryBtn: { backgroundColor: '#f0f0f0', borderRadius: 8, padding: 14, alignItems: 'center', borderWidth: 1, borderColor: '#ddd' },
   secondaryBtnText: { fontSize: 14, fontWeight: '700', color: '#666' },
+  // Nav button variants for schedule header
+  adminNavBtn: { backgroundColor: COLORS.secondary, borderRadius: 10, height: 44, paddingHorizontal: 18, justifyContent: 'center', alignItems: 'center', shadowColor: COLORS.secondary, shadowOpacity: 0.25, shadowRadius: 6, elevation: 3 },
+  adminNavBtnText: { fontSize: 13, fontWeight: '800', color: COLORS.white, textAlign: 'center' },
+  settingsNavBtn: { backgroundColor: COLORS.white, borderRadius: 10, height: 44, width: 44, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: '#D8D8D8' },
+  settingsNavBtnText: { fontSize: 17, color: COLORS.dark, textAlign: 'center' },
+  // Login screen redesign
+  loginRoot: { flex: 1, backgroundColor: COLORS.secondary },
+  loginHero: { paddingTop: 64, paddingBottom: 44, paddingHorizontal: 32, alignItems: 'center' },
+  loginHeroEmoji: { fontSize: 52, marginBottom: 18 },
+  loginHeroTitle: { fontSize: 28, fontWeight: '900', color: COLORS.white, letterSpacing: -0.5, textAlign: 'center', marginBottom: 10 },
+  loginHeroSubtitle: { fontSize: 15, color: 'rgba(255,255,255,0.75)', textAlign: 'center' },
+  loginFormPanel: { flex: 1, backgroundColor: COLORS.light, borderTopLeftRadius: 28, borderTopRightRadius: 28 },
+  loginFormContent: { padding: 28, paddingBottom: 48 },
+  loginCardHeading: { fontSize: 22, fontWeight: '800', color: COLORS.dark, marginBottom: 28, letterSpacing: -0.3 },
+  loginFieldLabel: { fontSize: 12, fontWeight: '700', color: COLORS.muted, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1.2 },
+  loginTextInput: { borderWidth: 1.5, borderColor: '#E0E0E0', borderRadius: 12, padding: 14, fontSize: 16, backgroundColor: COLORS.white, color: COLORS.dark, fontWeight: '500', marginBottom: 20 },
+  loginPinWrapper: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: '#E0E0E0', borderRadius: 12, backgroundColor: COLORS.white, marginBottom: 20 },
+  loginPinInput: { flex: 1, padding: 14, fontSize: 16, color: COLORS.dark, fontWeight: '500' },
+  loginEyeBtn: { padding: 14 },
+  loginEyeIcon: { fontSize: 16 },
 });
