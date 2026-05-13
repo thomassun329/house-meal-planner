@@ -804,28 +804,35 @@ export default function App() {
     return (
       <View style={styles.scheduleContainer}>
         <View style={styles.scheduleHeader}>
-          <View>
-            <Text style={styles.scheduleTitle}>🏠 Meal Schedule</Text>
-            <Text style={styles.scheduleSubtitle}>{currentMember} • {isAdmin ? '👑 Admin' : '👤 Member'}</Text>
-          </View>
-          <View style={styles.headerButtonsGroup}>
-            {isAdmin && (
-              <>
-                <TouchableOpacity style={styles.adminNavBtn} onPress={() => setCurrentScreen('dashboard')}>
-                  <Text style={styles.adminNavBtnText}>Dashboard</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.adminNavBtn} onPress={() => setCurrentScreen('members')}>
-                  <Text style={styles.adminNavBtnText}>Members</Text>
-                </TouchableOpacity>
-              </>
-            )}
-            <TouchableOpacity style={styles.settingsNavBtn} onPress={() => setCurrentScreen('settings')}>
-              <Text style={styles.settingsNavBtnText}>⚙</Text>
-            </TouchableOpacity>
+          <View style={styles.scheduleHeaderTop}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.scheduleTitle}>🏠 Meal Schedule</Text>
+              <Text style={styles.scheduleSubtitle}>{currentMember} • {isAdmin ? '👑 Admin' : '👤 Member'}</Text>
+            </View>
             <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
               <Text style={styles.logoutBtnText}>Logout</Text>
             </TouchableOpacity>
           </View>
+          {isAdmin && (
+            <View style={styles.headerButtonsGroup}>
+              <TouchableOpacity style={styles.adminNavBtn} onPress={() => setCurrentScreen('dashboard')}>
+                <Text style={styles.adminNavBtnText}>Dashboard</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.adminNavBtn} onPress={() => setCurrentScreen('members')}>
+                <Text style={styles.adminNavBtnText}>Members</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.settingsNavBtn} onPress={() => setCurrentScreen('settings')}>
+                <Text style={styles.settingsNavBtnText}>⚙</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          {!isAdmin && (
+            <View style={styles.headerButtonsGroup}>
+              <TouchableOpacity style={styles.settingsNavBtn} onPress={() => setCurrentScreen('settings')}>
+                <Text style={styles.settingsNavBtnText}>⚙</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         <ScrollView style={styles.tableContainer} scrollEventThrottle={16}>
@@ -984,10 +991,11 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.light },
   scrollContent: { padding: 24, justifyContent: 'center', minHeight: '100%' },
   scheduleContainer: { flex: 1, backgroundColor: COLORS.light },
-  scheduleHeader: { backgroundColor: COLORS.white, padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, shadowColor: COLORS.dark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
+  scheduleHeader: { backgroundColor: COLORS.white, paddingHorizontal: 20, paddingTop: 32, paddingBottom: 16, flexDirection: 'column', shadowColor: COLORS.dark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
+  scheduleHeaderTop: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
   scheduleTitle: { fontSize: 32, fontWeight: 'bold', color: COLORS.dark, letterSpacing: -0.5 },
   scheduleSubtitle: { fontSize: 16, color: COLORS.muted, marginTop: 8, fontWeight: '500' },
-  headerButtonsGroup: { flexDirection: 'row', gap: 12 },
+  headerButtonsGroup: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' },
   summaryBtn: { backgroundColor: COLORS.white, borderRadius: 12, padding: 12, paddingHorizontal: 20, shadowColor: COLORS.dark, shadowOpacity: 0.15, shadowRadius: 8, elevation: 4 },
   summaryBtnText: { fontSize: 14, fontWeight: '800', color: COLORS.dark, textAlign: 'center' },
   tableWrapper: { flex: 1, backgroundColor: '#FFFFFF', flexDirection: 'column', width: '100%' },
@@ -997,8 +1005,8 @@ const styles = StyleSheet.create({
   dateHeaderCell: { width: 90, minHeight: 60, flexShrink: 0 },
   mealTypeHeaderCell: { width: 50, minHeight: 60, flexShrink: 0 },
   memberHeaderCell: { flex: 1, minHeight: 60 },
-  headerText: { fontSize: 11, fontWeight: '700', color: COLORS.dark },
-  memberHeaderText: { fontSize: 10, fontWeight: '700', color: COLORS.dark, textAlign: 'center' },
+  headerText: { fontSize: 13, fontWeight: '700', color: COLORS.dark },
+  memberHeaderText: { fontSize: 12, fontWeight: '700', color: COLORS.dark, textAlign: 'center' },
   dietaryBadge: { fontSize: 8, color: COLORS.warning, marginTop: 2 },
   dateGroup: {},
   dateRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
@@ -1036,12 +1044,12 @@ const styles = StyleSheet.create({
   loginBtn: { backgroundColor: COLORS.secondary, borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 32, shadowColor: COLORS.secondary, shadowOpacity: 0.2, shadowRadius: 8, elevation: 3 },
   loginBtnDisabled: { backgroundColor: COLORS.muted, shadowOpacity: 0 },
   loginBtnText: { fontSize: 18, fontWeight: '700', color: COLORS.white, letterSpacing: 0.5 },
-  logoutBtn: { backgroundColor: COLORS.accent, borderRadius: 12, height: 44, paddingHorizontal: 20, justifyContent: 'center', alignItems: 'center', shadowColor: COLORS.accent, shadowOpacity: 0.2, shadowRadius: 8, elevation: 3 },
-  logoutBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
+  logoutBtn: { backgroundColor: COLORS.accent, borderRadius: 10, height: 36, paddingHorizontal: 14, justifyContent: 'center', alignItems: 'center', shadowColor: COLORS.accent, shadowOpacity: 0.2, shadowRadius: 8, elevation: 3 },
+  logoutBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.white },
   dashboardContainer: { flex: 1, backgroundColor: COLORS.light },
   dashboardHeader: { backgroundColor: COLORS.white, padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, shadowColor: COLORS.dark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
-  dashboardTitle: { fontSize: 32, fontWeight: 'bold', color: COLORS.dark, letterSpacing: -0.5 },
-  backButton: { fontSize: 16, fontWeight: '700', color: COLORS.secondary },
+  dashboardTitle: { fontSize: 22, fontWeight: 'bold', color: COLORS.dark, letterSpacing: -0.3, marginLeft: 16 },
+  backButton: { fontSize: 16, fontWeight: '700', color: COLORS.secondary, flexShrink: 0 },
   dashboardContent: { flex: 1, padding: 24 },
   filterCard: { backgroundColor: COLORS.white, borderRadius: 16, padding: 24, marginBottom: 20, shadowColor: COLORS.dark, shadowOpacity: 0.08, shadowRadius: 12, elevation: 2 },
   filterTitle: { fontSize: 18, fontWeight: '700', color: COLORS.dark, marginBottom: 16 },
@@ -1074,7 +1082,7 @@ const styles = StyleSheet.create({
   legendNote: { fontSize: 12, color: COLORS.muted, marginTop: 8, fontStyle: 'italic' },
   managementContainer: { flex: 1, backgroundColor: COLORS.light },
   managementHeader: { backgroundColor: COLORS.white, padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, shadowColor: COLORS.dark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
-  managementTitle: { fontSize: 32, fontWeight: 'bold', color: COLORS.dark, letterSpacing: -0.5 },
+  managementTitle: { fontSize: 22, fontWeight: 'bold', color: COLORS.dark, letterSpacing: -0.3, marginLeft: 16 },
   managementContent: { flex: 1, padding: 24 },
   addMemberCard: { backgroundColor: COLORS.white, borderRadius: 16, padding: 24, marginBottom: 20, shadowColor: COLORS.dark, shadowOpacity: 0.08, shadowRadius: 12, elevation: 2 },
   addMemberTitle: { fontSize: 18, fontWeight: '700', color: COLORS.dark, marginBottom: 16 },
@@ -1114,7 +1122,7 @@ const styles = StyleSheet.create({
   dropdownItemText: { fontSize: 13, color: COLORS.dark },
   settingsContainer: { flex: 1, backgroundColor: COLORS.light },
   settingsHeader: { backgroundColor: COLORS.white, padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, shadowColor: COLORS.dark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
-  settingsTitle: { fontSize: 28, fontWeight: 'bold', color: COLORS.dark, letterSpacing: -0.5 },
+  settingsTitle: { fontSize: 22, fontWeight: 'bold', color: COLORS.dark, letterSpacing: -0.3, marginLeft: 16 },
   settingsContent: { flex: 1, padding: 16 },
   settingsCard: { backgroundColor: COLORS.white, borderRadius: 12, padding: 16, marginBottom: 16, elevation: 2 },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: COLORS.dark, marginBottom: 12 },
@@ -1130,10 +1138,10 @@ const styles = StyleSheet.create({
   secondaryBtn: { backgroundColor: '#f0f0f0', borderRadius: 8, padding: 14, alignItems: 'center', borderWidth: 1, borderColor: '#ddd' },
   secondaryBtnText: { fontSize: 14, fontWeight: '700', color: '#666' },
   // Nav button variants for schedule header
-  adminNavBtn: { backgroundColor: COLORS.secondary, borderRadius: 10, height: 44, paddingHorizontal: 18, justifyContent: 'center', alignItems: 'center', shadowColor: COLORS.secondary, shadowOpacity: 0.25, shadowRadius: 6, elevation: 3 },
-  adminNavBtnText: { fontSize: 13, fontWeight: '800', color: COLORS.white, textAlign: 'center' },
-  settingsNavBtn: { backgroundColor: COLORS.white, borderRadius: 10, height: 44, width: 44, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: '#D8D8D8' },
-  settingsNavBtnText: { fontSize: 17, color: COLORS.dark, textAlign: 'center' },
+  adminNavBtn: { backgroundColor: COLORS.secondary, borderRadius: 10, height: 36, paddingHorizontal: 14, justifyContent: 'center', alignItems: 'center', shadowColor: COLORS.secondary, shadowOpacity: 0.25, shadowRadius: 6, elevation: 3 },
+  adminNavBtnText: { fontSize: 12, fontWeight: '800', color: COLORS.white, textAlign: 'center' },
+  settingsNavBtn: { backgroundColor: COLORS.white, borderRadius: 10, height: 36, width: 36, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: '#D8D8D8' },
+  settingsNavBtnText: { fontSize: 15, color: COLORS.dark, textAlign: 'center' },
   // Login screen redesign
   loginRoot: { flex: 1, backgroundColor: COLORS.secondary },
   loginHero: { paddingTop: 64, paddingBottom: 44, paddingHorizontal: 32, alignItems: 'center' },
