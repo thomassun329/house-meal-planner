@@ -1,4 +1,4 @@
-const CACHE_NAME = 'house-meal-planner-v1';
+const CACHE_NAME = 'house-meal-planner-1778712062002';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -32,30 +32,24 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // Network-first: always try to get the latest from the network,
+  // fall back to cache only when offline.
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then(response => {
-        if (response) {
-          return response;
+        if (!response || response.status !== 200 || response.type === 'error') {
+          return response || caches.match(event.request);
         }
 
-        return fetch(event.request)
-          .then(response => {
-            if (!response || response.status !== 200 || response.type === 'error') {
-              return response;
-            }
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME)
+          .then(cache => cache.put(event.request, responseToCache));
 
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          })
-          .catch(() => {
-            return caches.match('/index.html');
-          });
+        return response;
       })
+      .catch(() =>
+        caches.match(event.request)
+          .then(cached => cached || caches.match('/index.html'))
+      )
   );
 });
