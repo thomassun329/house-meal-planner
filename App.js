@@ -243,13 +243,23 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
   };
 
   const allMembers = getAllMembers();
+
+  const availableYears = (() => {
+    const years = new Set();
+    Object.keys(meals).forEach(key => {
+      const year = parseInt(key.substring(0, 4));
+      if (!isNaN(year)) years.add(year);
+    });
+    const sorted = Array.from(years).sort();
+    return sorted.length > 0 ? sorted : [new Date().getFullYear()];
+  })();
+
   const getMonthlyStats = () => {
     const months = {};
 
-    // Generate dates for selected year
     const today = new Date();
     const startDate = new Date(`${filterYear}-01-01`);
-    const endDate = new Date(`${filterYear}-12-31`);
+    const endDate = filterYear === today.getFullYear() ? today : new Date(`${filterYear}-12-31`);
 
     for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
       const yyyy = d.getFullYear();
@@ -289,7 +299,9 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
   };
 
   const monthlyStats = getMonthlyStats();
-  const monthLabels = Object.keys(monthlyStats).sort();
+  const monthLabels = Object.keys(monthlyStats).sort().filter(m =>
+    monthlyStats[m].normal + monthlyStats[m].vegetarian > 0
+  );
 
   const chartData = {
     labels: monthLabels.map(m => {
@@ -336,7 +348,7 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
           <View style={styles.filterGroup}>
             <Text style={styles.filterLabel}>Year</Text>
             <View style={styles.filterButtonGroup}>
-              {[2024, 2025, 2026].map(year => (
+              {availableYears.map(year => (
                 <TouchableOpacity
                   key={year}
                   style={[styles.filterButton, filterYear === year && styles.filterButtonActive]}

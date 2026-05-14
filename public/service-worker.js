@@ -1,4 +1,4 @@
-const CACHE_NAME = 'house-meal-planner-1778788620518';
+const CACHE_NAME = 'house-meal-planner-1778789902163';
 const urlsToCache = [
   '/',
   '/index.html',
