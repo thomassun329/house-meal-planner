@@ -554,7 +554,7 @@ export default function App() {
     try {
       const { name: savedName, isAdmin: savedIsAdmin } = JSON.parse(savedUser);
 
-      // For admin, always auto-login
+      // For admin, always auto-login (no member list needed)
       if (savedIsAdmin === true) {
         autoLoginAttemptedRef.current = true;
         setCurrentMember(savedName);
@@ -566,15 +566,13 @@ export default function App() {
         return;
       }
 
-      // For members, wait until members list has loaded
-      if (fbMembersLoading || members.length === 0) {
-        return;
-      }
+      // Wait until Firebase members have loaded before checking
+      if (fbMembersLoading) return;
 
       autoLoginAttemptedRef.current = true;
 
-      // Check if saved member still exists (use local members state which is synced from Firebase)
-      if (members.includes(savedName)) {
+      // Check against fbMembers (Firebase data) not local state which may lag behind
+      if (fbMembers.includes(savedName)) {
         setCurrentMember(savedName);
         setIsAdmin(false);
         setIsLoggedIn(true);
@@ -587,7 +585,7 @@ export default function App() {
     } catch (e) {
       localStorage.removeItem('houseMealPlannerUser');
     }
-  }, [members, fbMembersLoading, isLoggedIn]);
+  }, [fbMembers, fbMembersLoading, isLoggedIn]);
 
   useEffect(() => {
     if (!fbMealsLoading) {
