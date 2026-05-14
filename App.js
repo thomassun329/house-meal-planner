@@ -976,15 +976,15 @@ export default function App() {
 
 // Botanical Garden–influenced palette: blue brand, fresh green for food/attending, warm muted
 const COLORS = {
-  primary: '#000000',      // Black
-  secondary: '#0070F3',    // Brand blue
-  accent: '#FF0080',       // Pink (logout / remove)
-  success: '#22C55E',      // Fresh green (attending meal)
-  warning: '#F5A623',      // Amber
-  light: '#FAFAFA',        // Near-white surface
-  white: '#FFFFFF',
-  dark: '#111111',         // Near-black text
-  muted: '#888888',        // Warm gray
+  primary: '#1a2e25',      // Deep forest
+  secondary: '#4a7c59',    // Fern green
+  accent: '#b7472a',       // Terracotta
+  success: '#6aab78',      // Garden green (attending)
+  warning: '#f9a620',      // Marigold
+  light: '#f5f3ed',        // Cream
+  white: '#ffffff',
+  dark: '#1a2e25',         // Deep forest text
+  muted: '#8a9e8f',        // Sage gray
 };
 
 const styles = StyleSheet.create({
