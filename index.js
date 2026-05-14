@@ -9,6 +9,11 @@ if ('serviceWorker' in navigator) {
       .then(reg => console.log('Service Worker registered'))
       .catch(err => console.log('Service Worker registration failed:', err));
   });
+
+  // When a new SW takes over, reload so the new JS bundle is served
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
 }
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);
