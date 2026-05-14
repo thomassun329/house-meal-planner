@@ -15,8 +15,6 @@ function MealCell({ state, onPress, canEdit = true }) {
         return { icon: '', bg: canEdit ? COLORS.light : COLORS.muted, text: COLORS.muted };
       case 'attending':
         return { icon: '✓', bg: COLORS.success, text: COLORS.white };
-      case 'attending+container':
-        return { icon: '✓\n+\n🍱', bg: COLORS.secondary, text: COLORS.white };
       default:
         return { icon: '', bg: canEdit ? COLORS.light : COLORS.muted, text: COLORS.muted };
     }
@@ -81,10 +79,9 @@ function SettingsScreen({ currentMember, memberDietary, isAdmin, onBack }) {
           <View style={styles.divider} />
 
           <Text style={styles.infoLabel}>How it works:</Text>
-          <Text style={styles.infoBullet}>• Tap meal cells to cycle through:</Text>
+          <Text style={styles.infoBullet}>• Tap meal cells to toggle:</Text>
           <Text style={styles.infoBulletNested}>  ☐ Not joining the meal</Text>
           <Text style={styles.infoBulletNested}>  ✓ Joining the meal</Text>
-          <Text style={styles.infoBulletNested}>  ✓+🍱 Joining meal and need additional lunch box</Text>
           <Text style={styles.infoBullet}>• Admins can manage members and view analytics</Text>
           <Text style={styles.infoBullet}>• Members can only edit their own meal entries</Text>
           <Text style={styles.infoBullet}>• Historical data is preserved for analytics</Text>
@@ -94,7 +91,6 @@ function SettingsScreen({ currentMember, memberDietary, isAdmin, onBack }) {
         <View style={styles.settingsCard}>
           <Text style={styles.sectionTitle}>Quick Tips</Text>
           <Text style={styles.infoBullet}>✓ = Joining the meal</Text>
-          <Text style={styles.infoBullet}>🍱 = Need lunchbox</Text>
           <Text style={styles.infoBullet}>Diet is set when members are added</Text>
           <Text style={styles.infoBullet}>Dashboard shows monthly meal analytics</Text>
         </View>
@@ -263,7 +259,7 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
       const monthKey = `${yyyy}-${mm}`;
 
       if (!months[monthKey]) {
-        months[monthKey] = { normal: 0, vegetarian: 0, container: 0 };
+        months[monthKey] = { normal: 0, vegetarian: 0 };
       }
 
       ['lunch', 'dinner'].forEach(mealType => {
@@ -283,10 +279,6 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
               months[monthKey].vegetarian++;
             } else {
               months[monthKey].normal++;
-            }
-
-            if (state.includes('container')) {
-              months[monthKey].container++;
             }
           }
         });
@@ -496,7 +488,6 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
             <View style={[styles.legendColor, { backgroundColor: COLORS.success }]} />
             <Text style={styles.legendText}>Vegetarian portions</Text>
           </View>
-          <Text style={styles.legendNote}>Note: Containers are included in their respective diet type</Text>
         </View>
       </ScrollView>
     </View>
@@ -593,35 +584,7 @@ export default function App() {
     }
   }, [fbMeals, fbMealsLoading]);
 
-  // Meal data: { "YYYY-MM-DD-membername-lunch/dinner": "none" | "normal" | "vegetarian" | "normal+lunchbox" | "vegetarian+lunchbox" }
-  const [meals, setMeals] = useState(() => {
-    // Generate dummy data for past year
-    const dummyMeals = {};
-    const today = new Date();
-
-    // Generate data for 365 days in the past
-    for (let daysAgo = 365; daysAgo >= 0; daysAgo--) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - daysAgo);
-      const yyyy = date.getFullYear();
-      const mm = String(date.getMonth() + 1).padStart(2, '0');
-      const dd = String(date.getDate()).padStart(2, '0');
-      const dateStr = `${yyyy}-${mm}-${dd}`;
-
-      SAMPLE_MEMBERS.forEach(member => {
-        ['lunch', 'dinner'].forEach(mealType => {
-          const key = `${dateStr}-${member}-${mealType}`;
-          // Random 60% chance of attending
-          if (Math.random() < 0.6) {
-            const hasContainer = Math.random() < 0.3; // 30% chance of container
-            dummyMeals[key] = hasContainer ? 'attending+container' : 'attending';
-          }
-        });
-      });
-    }
-
-    return dummyMeals;
-  });
+  const [meals, setMeals] = useState({});
 
   const handleLogin = async () => {
     setLoginError('');
@@ -701,22 +664,18 @@ export default function App() {
   };
 
   const getDietarySummary = (dateStr, mealType) => {
-    const summary = { Normal: 0, Vegetarian: 0, Container: 0 };
+    const summary = { Normal: 0, Vegetarian: 0 };
     members.forEach(member => {
       const key = `${dateStr}-${member}-${mealType}`;
       const state = meals[key];
-      if (state === 'attending' || state === 'attending+container') {
+      if (state === 'attending') {
         const diet = memberDietary[member] || 'Normal';
         summary[diet]++;
-        if (state === 'attending+container') {
-          summary.Container++;
-        }
       }
     });
     const parts = [];
     if (summary.Normal > 0) parts.push(`${summary.Normal} normal`);
     if (summary.Vegetarian > 0) parts.push(`${summary.Vegetarian} vegetarian`);
-    if (summary.Container > 0) parts.push(`${summary.Container} lunchbox`);
     return parts.join(' + ') || 'None';
   };
 
@@ -745,8 +704,7 @@ export default function App() {
     let next = 'none';
 
     if (current === 'none') next = 'attending';
-    else if (current === 'attending') next = 'attending+container';
-    else if (current === 'attending+container') next = 'none';
+    else if (current === 'attending') next = 'none';
 
     setMeals(prev => ({
       ...prev,
@@ -904,7 +862,7 @@ export default function App() {
           </ScrollView>
         </ScrollView>
 
-        <Text style={styles.legend}>⬜ None  →  ✓ Attending  →  ✓+🍱 With lunchbox  — tap to cycle</Text>
+        <Text style={styles.legend}>⬜ None  →  ✓ Attending  — tap to toggle</Text>
       </View>
     );
   }
