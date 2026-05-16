@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Dimensions, Modal } from 'react-native';
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { useFirebaseMeals, useFirebaseMembers, useFirebaseHousehold } from './useFirebase';
+import { useFirebaseMeals, useFirebaseMembers, useFirebaseHousehold } from './hooks/useFirebase';
 
 const SAMPLE_MEMBERS = ['Alice', 'Bob', 'Sarah', 'John', 'Emma', 'Mike', 'Lisa', 'David', 'Sophie', 'Tom'];
 const DIETARY_OPTIONS = ['Normal', 'Vegetarian'];

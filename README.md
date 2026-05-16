@@ -21,7 +21,7 @@ Live URL: https://house-meal-planner.web.app
 
 ## Tech Stack
 
-- **Frontend:** React Native with Expo (web only), single file: `App.js`
+- **Frontend:** React Native with Expo (web only), single file: `src/App.js`
 - **Backend:** Firebase Firestore (real-time database)
 - **Authentication:** PIN-based (two-tier, hardcoded in app)
 - **Hosting:** Firebase Hosting
@@ -30,16 +30,21 @@ Live URL: https://house-meal-planner.web.app
 ## Project Structure
 
 ```
-├── App.js                 # Entire frontend — all screens and logic
-├── useFirebase.js         # Firebase hooks for data operations
-├── firebase.js            # Firebase config and initialization
-├── firestore.rules        # Firestore security rules
+├── src/
+│   ├── App.js             # Entire frontend — all screens and logic
+│   ├── firebase.js        # Firebase config and initialization
+│   └── hooks/
+│       └── useFirebase.js # Firebase hooks for data operations
+├── public/                # service-worker.js, manifest.json, favicon
+├── assets/                # Expo icons (icon.png, favicon.png, etc.)
+├── scripts/               # prebuild.js — bumps service worker cache version
+├── .github/workflows/     # deploy.yml — auto-deploy on push to main
+├── index.js               # Entry point with service worker registration
 ├── app.json               # Expo config
 ├── package.json           # Dependencies and build scripts
 ├── firebase.json          # Firebase hosting config
-├── index.js               # Entry point with service worker registration
-├── scripts/               # prebuild.js — bumps service worker cache version
-├── public/                # service-worker.js, manifest.json, favicon
+├── firestore.rules        # Firestore security rules
+├── firestore.indexes.json # Firestore index definitions
 └── dist/                  # Build output (generated, not committed)
 ```
 

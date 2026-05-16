@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { db } from './firebase';
+import { db } from '../firebase';
 import { doc, setDoc, collection, onSnapshot, deleteDoc } from 'firebase/firestore';
 
 const HOUSEHOLD_ID = 'default'; // Single household

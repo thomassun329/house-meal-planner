@@ -1,6 +1,6 @@
 import { registerRootComponent } from 'expo';
 
-import App from './App';
+import App from './src/App';
 
 // Register service worker for PWA support
 if ('serviceWorker' in navigator) {
