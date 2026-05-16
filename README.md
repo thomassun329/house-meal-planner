@@ -80,18 +80,15 @@ Admin access is a specific name+PIN combination, not a field on the member.
 ## Deployment
 
 ### Auto-deploy (normal workflow)
-Push to `main` — GitHub Actions builds and deploys automatically via
-`.github/workflows/deploy.yml`.
+Push to `main` — GitHub Actions builds and deploys both the app and
+Firestore rules automatically via `.github/workflows/deploy.yml`.
 
 ### Manual deploy
 ```bash
 npm run build
-firebase deploy --only hosting
-```
-
-### Firestore rules only
-```bash
-firebase deploy --only firestore:rules
+firebase deploy --only hosting         # app only
+firebase deploy --only firestore:rules # rules only
+firebase deploy --only hosting,firestore:rules  # both
 ```
 
 ## Firebase Setup
@@ -177,9 +174,10 @@ firebase logs                          # View deployment logs
 
 ## Security
 
+- App signs in to Firebase anonymously on load — Firestore rules are enforced
+- Firestore rules validate data shape (required fields, allowed values)
 - Members can only edit their own meals
 - Admins can edit all members' meals
-- Firestore rules enforce permissions at the database level
 - Auto-login stored in localStorage (name + isAdmin flag)
 
 ## Troubleshooting
