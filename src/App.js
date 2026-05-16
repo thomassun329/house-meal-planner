@@ -531,8 +531,8 @@ export default function App() {
   const autoLoginAttemptedRef = useRef(false);
 
   // Local state (synced from Firebase)
-  const [members, setMembers] = useState(SAMPLE_MEMBERS);
-  const [memberDietary, setMemberDietary] = useState(DIETARY_RESTRICTIONS);
+  const [members, setMembers] = useState([]);
+  const [memberDietary, setMemberDietary] = useState({});
   const [historicalMembers, setHistoricalMembers] = useState(new Set());
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberDietary, setNewMemberDietary] = useState(DIETARY_OPTIONS[0]);
@@ -540,16 +540,9 @@ export default function App() {
   // Sync Firebase data to local state
   useEffect(() => {
     if (!fbMembersLoading) {
-      // If Firebase members exist, use them; otherwise initialize with sample members
       if (fbMembers.length > 0) {
         setMembers(fbMembers);
         setMemberDietary(fbDietary);
-      } else if (members.length > 0 && members[0] === 'Alice') {
-        // First time: Firebase is empty, populate it with sample members
-        SAMPLE_MEMBERS.forEach(name => {
-          const dietary = DIETARY_RESTRICTIONS[name] || 'Normal';
-          fbAddMember(name, dietary);
-        });
       }
     }
   }, [fbMembers, fbDietary, fbMembersLoading]);
