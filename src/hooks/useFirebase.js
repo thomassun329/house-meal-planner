@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { db, auth } from '../firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { db } from '../firebase';
 import { doc, setDoc, collection, onSnapshot, deleteDoc } from 'firebase/firestore';
 
 const HOUSEHOLD_ID = 'default'; // Single household
@@ -10,33 +9,25 @@ export const useFirebaseMeals = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Wait for auth before starting Firestore listener
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (!user) return;
-
-      const mealsRef = collection(db, 'households', HOUSEHOLD_ID, 'mealEntries');
-      const unsubscribeFirestore = onSnapshot(
-        mealsRef,
-        (snapshot) => {
-          const mealsData = {};
-          snapshot.forEach((doc) => {
-            const { date, mealType, member, state } = doc.data();
-            const key = `${date}-${member}-${mealType}`;
-            mealsData[key] = state;
-          });
-          setMeals(mealsData);
-          setLoading(false);
-        },
-        (error) => {
-          console.error('Error fetching meals:', error);
-          setLoading(false);
-        }
-      );
-
-      return unsubscribeFirestore;
-    });
-
-    return unsubscribeAuth;
+    const mealsRef = collection(db, 'households', HOUSEHOLD_ID, 'mealEntries');
+    const unsubscribe = onSnapshot(
+      mealsRef,
+      (snapshot) => {
+        const mealsData = {};
+        snapshot.forEach((doc) => {
+          const { date, mealType, member, state } = doc.data();
+          const key = `${date}-${member}-${mealType}`;
+          mealsData[key] = state;
+        });
+        setMeals(mealsData);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Error fetching meals:', error);
+        setLoading(false);
+      }
+    );
+    return unsubscribe;
   }, []);
 
   const saveMeal = async (date, member, mealType, state) => {
@@ -63,35 +54,27 @@ export const useFirebaseMembers = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Wait for auth before starting Firestore listener
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (!user) return;
-
-      const membersRef = collection(db, 'households', HOUSEHOLD_ID, 'members');
-      const unsubscribeFirestore = onSnapshot(
-        membersRef,
-        (snapshot) => {
-          const membersData = [];
-          const dietaryData = {};
-          snapshot.forEach((doc) => {
-            const { name, dietary } = doc.data();
-            membersData.push(name);
-            dietaryData[name] = dietary;
-          });
-          setMembers(membersData.sort());
-          setMemberDietary(dietaryData);
-          setLoading(false);
-        },
-        (error) => {
-          console.error('Error fetching members:', error);
-          setLoading(false);
-        }
-      );
-
-      return unsubscribeFirestore;
-    });
-
-    return unsubscribeAuth;
+    const membersRef = collection(db, 'households', HOUSEHOLD_ID, 'members');
+    const unsubscribe = onSnapshot(
+      membersRef,
+      (snapshot) => {
+        const membersData = [];
+        const dietaryData = {};
+        snapshot.forEach((doc) => {
+          const { name, dietary } = doc.data();
+          membersData.push(name);
+          dietaryData[name] = dietary;
+        });
+        setMembers(membersData.sort());
+        setMemberDietary(dietaryData);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Error fetching members:', error);
+        setLoading(false);
+      }
+    );
+    return unsubscribe;
   }, []);
 
   const addMember = async (name, dietary) => {

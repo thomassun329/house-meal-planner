@@ -2,8 +2,6 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Dimensions, Modal } from 'react-native';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useFirebaseMeals, useFirebaseMembers, useFirebaseHousehold } from './hooks/useFirebase';
-import { signInAnonymously } from 'firebase/auth';
-import { auth } from './firebase';
 
 const SAMPLE_MEMBERS = ['Alice', 'Bob', 'Sarah', 'John', 'Emma', 'Mike', 'Lisa', 'David', 'Sophie', 'Tom'];
 const DIETARY_OPTIONS = ['Normal', 'Vegetarian'];
@@ -509,11 +507,6 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
 }
 
 export default function App() {
-  // Sign in anonymously so Firestore security rules are enforced
-  useEffect(() => {
-    signInAnonymously(auth).catch(console.error);
-  }, []);
-
   // Firebase hooks
   const { meals: fbMeals, loading: fbMealsLoading, saveMeal } = useFirebaseMeals();
   const { members: fbMembers, memberDietary: fbDietary, loading: fbMembersLoading, addMember: fbAddMember, removeMember: fbRemoveMember } = useFirebaseMembers();
