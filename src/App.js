@@ -520,6 +520,13 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState('schedule'); // 'schedule', 'dashboard', 'members', or 'settings'
   const [loginError, setLoginError] = useState('');
   const autoLoginAttemptedRef = useRef(false);
+  const headerScrollRef = useRef(null);
+  const dataScrollRef = useRef(null);
+
+  const syncHeaderScroll = (event) => {
+    const x = event.nativeEvent.contentOffset.x;
+    headerScrollRef.current?.scrollTo({ x, animated: false });
+  };
 
   // Local state (synced from Firebase)
   const [members, setMembers] = useState([]);
@@ -794,27 +801,42 @@ export default function App() {
           )}
         </View>
 
-        <ScrollView style={styles.tableContainer} scrollEventThrottle={16}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={true} contentContainerStyle={{ minWidth: '100%' }}>
-            <View style={{ width: '100%' }}>
-              {/* Header row with date/meal and member names */}
-              <View style={styles.memberHeaderRow}>
-                <View style={[styles.headerCell, styles.dateHeaderCell]}>
-                  <Text style={styles.headerText}>Date</Text>
-                </View>
-                <View style={[styles.headerCell, styles.mealTypeHeaderCell]}>
-                  <Text style={styles.headerText}>Meal</Text>
-                </View>
-                {sortedMembers.map(member => (
-                  <View key={member} style={[styles.headerCell, styles.memberHeaderCell]}>
-                    <Text style={styles.memberHeaderText}>{member}</Text>
-                  </View>
-                ))}
-                <View style={[styles.headerCell, styles.summaryHeaderCell]}>
-                  <Text style={styles.headerText}>Summary</Text>
-                </View>
+        <View style={styles.tableContainer}>
+          <ScrollView
+            ref={headerScrollRef}
+            horizontal
+            scrollEnabled={false}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ minWidth: '100%' }}
+          >
+            <View style={styles.memberHeaderRow}>
+              <View style={[styles.headerCell, styles.dateHeaderCell]}>
+                <Text style={styles.headerText}>Date</Text>
               </View>
+              <View style={[styles.headerCell, styles.mealTypeHeaderCell]}>
+                <Text style={styles.headerText}>Meal</Text>
+              </View>
+              {sortedMembers.map(member => (
+                <View key={member} style={[styles.headerCell, styles.memberHeaderCell]}>
+                  <Text style={styles.memberHeaderText}>{member}</Text>
+                </View>
+              ))}
+              <View style={[styles.headerCell, styles.summaryHeaderCell]}>
+                <Text style={styles.headerText}>Summary</Text>
+              </View>
+            </View>
+          </ScrollView>
 
+          <ScrollView style={{ flex: 1 }} scrollEventThrottle={16}>
+            <ScrollView
+              ref={dataScrollRef}
+              horizontal
+              showsHorizontalScrollIndicator={true}
+              contentContainerStyle={{ minWidth: '100%' }}
+              onScroll={syncHeaderScroll}
+              scrollEventThrottle={16}
+            >
+              <View style={{ width: '100%' }}>
               {/* Date rows with lunch and dinner */}
               {dates.map(date => (
                 <View key={date} style={styles.dateGroup}>
@@ -861,9 +883,10 @@ export default function App() {
                   </View>
                 </View>
               ))}
-            </View>
+              </View>
+            </ScrollView>
           </ScrollView>
-        </ScrollView>
+        </View>
 
         <Text style={styles.legend}>⬜ None  →  ✓ Attending  — tap to toggle</Text>
       </View>
