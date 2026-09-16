@@ -94,7 +94,7 @@ export const useFirebaseMembers = () => {
       await deleteDoc(doc(db, 'households', HOUSEHOLD_ID, 'members', name));
     } catch (error) {
       console.error('Error removing member:', error);
-      alert('Error removing member: ' + error.message);
+      alert('Fehler beim Entfernen des Mitglieds: ' + error.message);
     }
   };
 

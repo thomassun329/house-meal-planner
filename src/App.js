@@ -5,6 +5,8 @@ import { useFirebaseMeals, useFirebaseMembers, useFirebaseHousehold } from './ho
 
 const DIETARY_OPTIONS = ['Normal', 'Vegetarian'];
 
+const translateDiet = (diet) => (diet === 'Vegetarian' ? 'Vegetarisch' : 'Normal');
+
 
 function MealCell({ state, onPress, canEdit = true }) {
   const getDisplay = () => {
@@ -36,16 +38,16 @@ function SettingsScreen({ currentMember, memberDietary, isAdmin, onBack }) {
     <View style={styles.settingsContainer}>
       <View style={styles.settingsHeader}>
         <TouchableOpacity onPress={onBack}>
-          <Text style={styles.backButton}>← Back</Text>
+          <Text style={styles.backButton}>← Zurück</Text>
         </TouchableOpacity>
-        <Text style={styles.settingsTitle}>⚙️ Settings</Text>
+        <Text style={styles.settingsTitle}>⚙️ Einstellungen</Text>
         <View style={{ width: 50 }} />
       </View>
 
       <ScrollView style={styles.settingsContent}>
         {/* Profile Section */}
         <View style={styles.settingsCard}>
-          <Text style={styles.sectionTitle}>Profile</Text>
+          <Text style={styles.sectionTitle}>Profil</Text>
 
           <View style={styles.settingItem}>
             <Text style={styles.settingLabel}>Name</Text>
@@ -53,44 +55,44 @@ function SettingsScreen({ currentMember, memberDietary, isAdmin, onBack }) {
           </View>
 
           <View style={styles.settingItem}>
-            <Text style={styles.settingLabel}>Account Type</Text>
-            <Text style={styles.settingValue}>{isAdmin ? '👑 Admin' : '👤 Member'}</Text>
+            <Text style={styles.settingLabel}>Kontotyp</Text>
+            <Text style={styles.settingValue}>{isAdmin ? '👑 Admin' : '👤 Mitglied'}</Text>
           </View>
 
           <View style={styles.settingItem}>
-            <Text style={styles.settingLabel}>Diet Preference</Text>
-            <Text style={styles.settingValue}>{memberDietary[currentMember] || 'Normal'}</Text>
+            <Text style={styles.settingLabel}>Ernährungspräferenz</Text>
+            <Text style={styles.settingValue}>{translateDiet(memberDietary[currentMember] || 'Normal')}</Text>
           </View>
         </View>
 
         {/* Info Section */}
         <View style={styles.settingsCard}>
-          <Text style={styles.sectionTitle}>About</Text>
+          <Text style={styles.sectionTitle}>Über</Text>
 
           <Text style={styles.infoText}>
             Feldmark | Essenplanung v1.0
           </Text>
           <Text style={styles.infoText}>
-            Coordinate household meals and track dietary preferences.
+            Haushaltsessen koordinieren und Ernährungspräferenzen verfolgen.
           </Text>
 
           <View style={styles.divider} />
 
-          <Text style={styles.infoLabel}>How it works:</Text>
-          <Text style={styles.infoBullet}>• Tap meal cells to toggle:</Text>
-          <Text style={styles.infoBulletNested}>  ☐ Not joining the meal</Text>
-          <Text style={styles.infoBulletNested}>  ✓ Joining the meal</Text>
-          <Text style={styles.infoBullet}>• Admins can manage members and view analytics</Text>
-          <Text style={styles.infoBullet}>• Members can only edit their own meal entries</Text>
-          <Text style={styles.infoBullet}>• Historical data is preserved for analytics</Text>
+          <Text style={styles.infoLabel}>So funktioniert's:</Text>
+          <Text style={styles.infoBullet}>• Tippe auf die Essenszellen zum Umschalten:</Text>
+          <Text style={styles.infoBulletNested}>  ☐ Nimmt nicht am Essen teil</Text>
+          <Text style={styles.infoBulletNested}>  ✓ Nimmt am Essen teil</Text>
+          <Text style={styles.infoBullet}>• Admins können Mitglieder verwalten und Auswertungen einsehen</Text>
+          <Text style={styles.infoBullet}>• Mitglieder können nur ihre eigenen Einträge bearbeiten</Text>
+          <Text style={styles.infoBullet}>• Verlaufsdaten werden für Auswertungen aufbewahrt</Text>
         </View>
 
         {/* Quick Tips */}
         <View style={styles.settingsCard}>
-          <Text style={styles.sectionTitle}>Quick Tips</Text>
-          <Text style={styles.infoBullet}>✓ = Joining the meal</Text>
-          <Text style={styles.infoBullet}>Diet is set when members are added</Text>
-          <Text style={styles.infoBullet}>Dashboard shows monthly meal analytics</Text>
+          <Text style={styles.sectionTitle}>Kurztipps</Text>
+          <Text style={styles.infoBullet}>✓ = Nimmt am Essen teil</Text>
+          <Text style={styles.infoBullet}>Die Ernährung wird beim Hinzufügen von Mitgliedern festgelegt</Text>
+          <Text style={styles.infoBullet}>Die Übersicht zeigt monatliche Essensauswertungen</Text>
         </View>
       </ScrollView>
     </View>
@@ -104,7 +106,7 @@ function MemberManagement({ members, memberDietary, onAddMember, onRemoveMember,
 
   const handleAddMember = () => {
     if (!newName.trim()) {
-      Alert.alert('Error', 'Please enter a member name');
+      Alert.alert('Fehler', 'Bitte gib einen Namen für das Mitglied ein');
       return;
     }
     onAddMember(newName, newDietary);
@@ -116,26 +118,26 @@ function MemberManagement({ members, memberDietary, onAddMember, onRemoveMember,
     <View style={styles.managementContainer}>
       <View style={styles.managementHeader}>
         <TouchableOpacity onPress={onBack}>
-          <Text style={styles.backButton}>← Back</Text>
+          <Text style={styles.backButton}>← Zurück</Text>
         </TouchableOpacity>
-        <Text style={styles.managementTitle}>👥 Member Management</Text>
+        <Text style={styles.managementTitle}>👥 Mitgliederverwaltung</Text>
         <View style={{ width: 50 }} />
       </View>
 
       <ScrollView style={styles.managementContent} scrollEventThrottle={16}>
         {/* Add Member Section */}
         <View style={styles.addMemberCard}>
-          <Text style={styles.addMemberTitle}>Add New Member</Text>
+          <Text style={styles.addMemberTitle}>Neues Mitglied hinzufügen</Text>
 
           <Text style={styles.label}>Name</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter member name"
+            placeholder="Namen des Mitglieds eingeben"
             value={newName}
             onChangeText={setNewName}
           />
 
-          <Text style={styles.label}>Diet</Text>
+          <Text style={styles.label}>Ernährung</Text>
           <View style={styles.dietaryOptions}>
             {DIETARY_OPTIONS.map(diet => (
               <TouchableOpacity
@@ -144,27 +146,27 @@ function MemberManagement({ members, memberDietary, onAddMember, onRemoveMember,
                 onPress={() => setNewDietary(diet)}
               >
                 <Text style={[styles.dietaryOptionText, newDietary === diet && styles.dietaryOptionTextActive]}>
-                  {diet}
+                  {translateDiet(diet)}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
 
           <TouchableOpacity style={styles.addButton} onPress={handleAddMember}>
-            <Text style={styles.addButtonText}>+ Add Member</Text>
+            <Text style={styles.addButtonText}>+ Mitglied hinzufügen</Text>
           </TouchableOpacity>
         </View>
 
         {/* Members List */}
         <View style={styles.membersListCard} pointerEvents="auto">
-          <Text style={styles.membersListTitle}>Current Members ({members.length})</Text>
+          <Text style={styles.membersListTitle}>Aktuelle Mitglieder ({members.length})</Text>
 
           {members.map(member => (
             <View key={member} style={styles.memberItem} pointerEvents="auto">
               <View style={styles.memberInfo} pointerEvents="none">
                 <Text style={styles.memberName}>{member}</Text>
                 {memberDietary[member] && memberDietary[member] !== 'Normal' && (
-                  <Text style={styles.memberDietary}>{memberDietary[member]}</Text>
+                  <Text style={styles.memberDietary}>{translateDiet(memberDietary[member])}</Text>
                 )}
               </View>
               <TouchableOpacity
@@ -187,14 +189,14 @@ function MemberManagement({ members, memberDietary, onAddMember, onRemoveMember,
         >
           <View style={styles.confirmationOverlay}>
             <View style={styles.confirmationBox}>
-              <Text style={styles.confirmationTitle}>Remove Member?</Text>
-              <Text style={styles.confirmationText}>Are you sure you want to remove {removingMember}?</Text>
+              <Text style={styles.confirmationTitle}>Mitglied entfernen?</Text>
+              <Text style={styles.confirmationText}>Bist du sicher, dass du {removingMember} entfernen möchtest?</Text>
               <View style={styles.confirmationButtons}>
                 <TouchableOpacity
                   style={[styles.confirmationButton, styles.cancelButton]}
                   onPress={() => setRemovingMember(null)}
                 >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                  <Text style={styles.cancelButtonText}>Abbrechen</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.confirmationButton, styles.removeConfirmButton]}
@@ -203,7 +205,7 @@ function MemberManagement({ members, memberDietary, onAddMember, onRemoveMember,
                     setRemovingMember(null);
                   }}
                 >
-                  <Text style={styles.removeConfirmButtonText}>Remove</Text>
+                  <Text style={styles.removeConfirmButtonText}>Entfernen</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -304,7 +306,7 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
   const chartData = {
     labels: monthLabels.map(m => {
       const [year, month] = m.split('-');
-      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthNames = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
       return `${monthNames[parseInt(month) - 1]} ${year}`;
     }),
     datasets: [
@@ -314,7 +316,7 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
         color: () => '#4CAF50',
       },
       {
-        label: 'Vegetarian',
+        label: 'Vegetarisch',
         data: monthLabels.map(m => monthlyStats[m].vegetarian),
         color: () => '#8BC34A',
       },
@@ -331,20 +333,20 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
     <View style={styles.dashboardContainer}>
       <View style={styles.dashboardHeader}>
         <TouchableOpacity onPress={onBack}>
-          <Text style={styles.backButton}>← Back</Text>
+          <Text style={styles.backButton}>← Zurück</Text>
         </TouchableOpacity>
-        <Text style={styles.dashboardTitle}>📊 Admin Dashboard</Text>
+        <Text style={styles.dashboardTitle}>📊 Admin-Übersicht</Text>
         <View style={{ width: 50 }} />
       </View>
 
       <ScrollView style={styles.dashboardContent}>
         {/* Filters */}
         <View style={styles.filterCard}>
-          <Text style={styles.filterTitle}>Filters</Text>
+          <Text style={styles.filterTitle}>Filter</Text>
 
           {/* Year Filter */}
           <View style={styles.filterGroup}>
-            <Text style={styles.filterLabel}>Year</Text>
+            <Text style={styles.filterLabel}>Jahr</Text>
             <View style={styles.filterButtonGroup}>
               {availableYears.map(year => (
                 <TouchableOpacity
@@ -362,7 +364,7 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
 
           {/* Diet Filter */}
           <View style={styles.filterGroup}>
-            <Text style={styles.filterLabel}>Diet</Text>
+            <Text style={styles.filterLabel}>Ernährung</Text>
             <View style={styles.filterButtonGroup}>
               {['all', 'normal', 'vegetarian'].map(type => (
                 <TouchableOpacity
@@ -371,7 +373,7 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
                   onPress={() => setFilterMealType(type)}
                 >
                   <Text style={[styles.filterButtonText, filterMealType === type && styles.filterButtonTextActive]}>
-                    {type === 'all' ? 'All' : type.charAt(0).toUpperCase() + type.slice(1)}
+                    {type === 'all' ? 'Alle' : type === 'vegetarian' ? 'Vegetarisch' : 'Normal'}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -380,15 +382,15 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
 
           {/* Member Filter */}
           <View style={styles.filterGroup}>
-            <Text style={styles.filterLabel}>Members</Text>
+            <Text style={styles.filterLabel}>Mitglieder</Text>
             <TouchableOpacity
               style={styles.dropdownButton}
               onPress={() => setShowMemberDropdown(!showMemberDropdown)}
             >
               <Text style={styles.dropdownButtonText}>
                 {filterMembers.has('all') || filterMembers.size === 0
-                  ? 'All Members'
-                  : `${filterMembers.size} selected`}
+                  ? 'Alle Mitglieder'
+                  : `${filterMembers.size} ausgewählt`}
               </Text>
               <Text style={styles.dropdownArrow}>{showMemberDropdown ? '▲' : '▼'}</Text>
             </TouchableOpacity>
@@ -404,7 +406,7 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
                   <View style={[styles.checkbox, filterMembers.has('all') && styles.checkboxActive]}>
                     {filterMembers.has('all') && <Text style={styles.checkmark}>✓</Text>}
                   </View>
-                  <Text style={styles.dropdownItemText}>All Members</Text>
+                  <Text style={styles.dropdownItemText}>Alle Mitglieder</Text>
                 </TouchableOpacity>
 
                 {allMembers.map(member => (
@@ -434,7 +436,7 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
         </View>
 
         <View style={styles.chartCard}>
-          <Text style={styles.chartTitle}>Monthly Portions</Text>
+          <Text style={styles.chartTitle}>Monatliche Portionen</Text>
           {chartData.labels.length > 0 ? (
             <View>
               <View style={styles.customChart}>
@@ -484,19 +486,19 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
               </View>
             </View>
           ) : (
-            <Text style={styles.noDataText}>No data available</Text>
+            <Text style={styles.noDataText}>Keine Daten verfügbar</Text>
           )}
         </View>
 
         <View style={styles.statsCard}>
-          <Text style={styles.statsTitle}>Legend</Text>
+          <Text style={styles.statsTitle}>Legende</Text>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: COLORS.secondary }]} />
-            <Text style={styles.legendText}>Normal portions</Text>
+            <Text style={styles.legendText}>Normale Portionen</Text>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendColor, { backgroundColor: COLORS.success }]} />
-            <Text style={styles.legendText}>Vegetarian portions</Text>
+            <Text style={styles.legendText}>Vegetarische Portionen</Text>
           </View>
         </View>
       </ScrollView>
@@ -593,11 +595,11 @@ export default function App() {
     setLoginError('');
 
     if (!name.trim()) {
-      setLoginError('Please enter your name');
+      setLoginError('Bitte gib deinen Namen ein');
       return;
     }
     if (!pin) {
-      setLoginError('Please enter your PIN');
+      setLoginError('Bitte gib deine PIN ein');
       return;
     }
 
@@ -608,7 +610,7 @@ export default function App() {
     const isMemberLogin = pin === '170120' && members.includes(name);
 
     if (!isAdminLogin && !isMemberLogin) {
-      setLoginError('Either name or PIN is incorrect');
+      setLoginError('Name oder PIN ist falsch');
       return;
     }
 
@@ -653,12 +655,11 @@ export default function App() {
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
     const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
     const day = days[date.getDay()];
     const d = date.getDate();
     const m = months[date.getMonth()];
-    const suffix = d % 10 === 1 && d !== 11 ? 'st' : d % 10 === 2 && d !== 12 ? 'nd' : d % 10 === 3 && d !== 13 ? 'rd' : 'th';
-    return `${m} ${d}${suffix} ${day}`;
+    return `${d}. ${m} ${day}`;
   };
 
   const getMealState = (dateStr, member, mealType) => {
@@ -678,8 +679,8 @@ export default function App() {
     });
     const parts = [];
     if (summary.Normal > 0) parts.push(`${summary.Normal} normal`);
-    if (summary.Vegetarian > 0) parts.push(`${summary.Vegetarian} vegetarian`);
-    return parts.join(' + ') || 'None';
+    if (summary.Vegetarian > 0) parts.push(`${summary.Vegetarian} vegetarisch`);
+    return parts.join(' + ') || 'Keine';
   };
 
   const sortedMembers = useMemo(() => {
@@ -698,7 +699,7 @@ export default function App() {
   const cycleMealState = (dateStr, member, mealType) => {
     // Enforce permission: only admins or the member themselves can edit
     if (!isAdmin && member !== currentMember) {
-      Alert.alert('Error', 'You can only edit your own meal entries');
+      Alert.alert('Fehler', 'Du kannst nur deine eigenen Einträge bearbeiten');
       return;
     }
 
@@ -765,20 +766,20 @@ export default function App() {
         <View style={styles.scheduleHeader}>
           <View style={styles.scheduleHeaderTop}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.scheduleTitle}>🏠 Meal Schedule</Text>
-              <Text style={styles.scheduleSubtitle}>{currentMember} • {isAdmin ? '👑 Admin' : '👤 Member'}</Text>
+              <Text style={styles.scheduleTitle}>🏠 Essensplan</Text>
+              <Text style={styles.scheduleSubtitle}>{currentMember} • {isAdmin ? '👑 Admin' : '👤 Mitglied'}</Text>
             </View>
             <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-              <Text style={styles.logoutBtnText}>Logout</Text>
+              <Text style={styles.logoutBtnText}>Abmelden</Text>
             </TouchableOpacity>
           </View>
           {isAdmin && (
             <View style={styles.headerButtonsGroup}>
               <TouchableOpacity style={styles.adminNavBtn} onPress={() => setCurrentScreen('dashboard')}>
-                <Text style={styles.adminNavBtnText}>Dashboard</Text>
+                <Text style={styles.adminNavBtnText}>Übersicht</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.adminNavBtn} onPress={() => setCurrentScreen('members')}>
-                <Text style={styles.adminNavBtnText}>Members</Text>
+                <Text style={styles.adminNavBtnText}>Mitglieder</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.settingsNavBtn} onPress={() => setCurrentScreen('settings')}>
                 <Text style={styles.settingsNavBtnText}>⚙</Text>
@@ -800,10 +801,10 @@ export default function App() {
               {/* Header row with date/meal and member names */}
               <View style={styles.memberHeaderRow}>
                 <View style={[styles.headerCell, styles.dateHeaderCell]}>
-                  <Text style={styles.headerText}>Date</Text>
+                  <Text style={styles.headerText}>Datum</Text>
                 </View>
                 <View style={[styles.headerCell, styles.mealTypeHeaderCell]}>
-                  <Text style={styles.headerText}>Meal</Text>
+                  <Text style={styles.headerText}>Essen</Text>
                 </View>
                 {sortedMembers.map(member => (
                   <View key={member} style={[styles.headerCell, styles.memberHeaderCell]}>
@@ -811,7 +812,7 @@ export default function App() {
                   </View>
                 ))}
                 <View style={[styles.headerCell, styles.summaryHeaderCell]}>
-                  <Text style={styles.headerText}>Summary</Text>
+                  <Text style={styles.headerText}>Zusammenfassung</Text>
                 </View>
               </View>
 
@@ -824,7 +825,7 @@ export default function App() {
                       <Text style={styles.dateText}>{formatDate(date)}</Text>
                     </View>
                     <View style={[styles.cell, styles.mealTypeCell]}>
-                      <Text style={styles.mealTypeText}>Lunch</Text>
+                      <Text style={styles.mealTypeText}>Mittag</Text>
                     </View>
                     {sortedMembers.map(member => (
                       <View key={`${date}-${member}-lunch`} style={[styles.cell, styles.mealCell]}>
@@ -844,7 +845,7 @@ export default function App() {
                   <View style={[styles.dateRow, styles.dinnerRow]}>
                     <View style={[styles.cell, styles.dateCell, styles.dateCellBottom]}></View>
                     <View style={[styles.cell, styles.mealTypeCell]}>
-                      <Text style={styles.mealTypeText}>Dinner</Text>
+                      <Text style={styles.mealTypeText}>Abend</Text>
                     </View>
                     {sortedMembers.map(member => (
                       <View key={`${date}-${member}-dinner`} style={[styles.cell, styles.mealCell]}>
@@ -865,7 +866,7 @@ export default function App() {
           </ScrollView>
         </ScrollView>
 
-        <Text style={styles.legend}>⬜ None  →  ✓ Attending  — tap to toggle</Text>
+        <Text style={styles.legend}>⬜ Keine  →  ✓ Dabei  — zum Umschalten tippen</Text>
       </View>
     );
   }
@@ -874,8 +875,8 @@ export default function App() {
     <View style={styles.loginRoot}>
       <View style={styles.loginHero}>
         <Text style={styles.loginHeroEmoji}>🏠</Text>
-        <Text style={styles.loginHeroTitle}>House Meal Planner</Text>
-        <Text style={styles.loginHeroSubtitle}>Coordinate household meals</Text>
+        <Text style={styles.loginHeroTitle}>Haus-Essensplaner</Text>
+        <Text style={styles.loginHeroSubtitle}>Haushaltsessen koordinieren</Text>
       </View>
 
       <ScrollView
@@ -883,12 +884,12 @@ export default function App() {
         contentContainerStyle={styles.loginFormContent}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.loginCardHeading}>Welcome back</Text>
+        <Text style={styles.loginCardHeading}>Willkommen zurück</Text>
 
-        <Text style={styles.loginFieldLabel}>Your Name</Text>
+        <Text style={styles.loginFieldLabel}>Dein Name</Text>
         <TextInput
           style={styles.loginTextInput}
-          placeholder="Enter your name"
+          placeholder="Namen eingeben"
           placeholderTextColor={COLORS.muted}
           value={name}
           onChangeText={setName}
@@ -899,7 +900,7 @@ export default function App() {
         <View style={styles.loginPinWrapper}>
           <TextInput
             style={styles.loginPinInput}
-            placeholder="Enter PIN"
+            placeholder="PIN eingeben"
             placeholderTextColor={COLORS.muted}
             value={pin}
             onChangeText={setPin}
@@ -924,7 +925,7 @@ export default function App() {
           onPress={handleLogin}
           disabled={loading}
         >
-          <Text style={styles.loginBtnText}>{loading ? 'Logging in...' : 'Login'}</Text>
+          <Text style={styles.loginBtnText}>{loading ? 'Anmeldung läuft...' : 'Anmelden'}</Text>
         </TouchableOpacity>
       </ScrollView>
 
