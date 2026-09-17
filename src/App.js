@@ -696,9 +696,11 @@ export default function App() {
     return sorted;
   }, [members, currentMember]);
 
+  const canEditMember = (member) => isAdmin || member === currentMember || member.toLowerCase().includes('gast');
+
   const cycleMealState = (dateStr, member, mealType) => {
-    // Enforce permission: only admins or the member themselves can edit
-    if (!isAdmin && member !== currentMember) {
+    // Enforce permission: admins, the member themselves, or anyone for guest columns
+    if (!canEditMember(member)) {
       Alert.alert('Fehler', 'Du kannst nur deine eigenen Einträge bearbeiten');
       return;
     }
@@ -832,7 +834,7 @@ export default function App() {
                         <MealCell
                           state={getMealState(date, member, 'lunch')}
                           onPress={() => cycleMealState(date, member, 'lunch')}
-                          canEdit={isAdmin || member === currentMember}
+                          canEdit={canEditMember(member)}
                         />
                       </View>
                     ))}
@@ -852,7 +854,7 @@ export default function App() {
                         <MealCell
                           state={getMealState(date, member, 'dinner')}
                           onPress={() => cycleMealState(date, member, 'dinner')}
-                          canEdit={isAdmin || member === currentMember}
+                          canEdit={canEditMember(member)}
                         />
                       </View>
                     ))}
