@@ -251,6 +251,7 @@ function ManageGuests({ dates, guestsByDateMeal, onAddGuest, onRemoveGuest, onBa
             max={dates[dates.length - 1]}
             onChange={(e) => setSelectedDate(e.target.value)}
             style={{
+              boxSizing: 'border-box',
               borderWidth: 2,
               borderColor: COLORS.light,
               borderRadius: 12,
