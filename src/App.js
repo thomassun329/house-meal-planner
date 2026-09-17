@@ -244,27 +244,29 @@ function ManageGuests({ dates, guestsByDateMeal, onAddGuest, onRemoveGuest, onBa
       <ScrollView style={styles.managementContent} scrollEventThrottle={16}>
         <View style={styles.addMemberCard}>
           <Text style={styles.label}>Datum</Text>
-          <input
-            type="date"
-            value={selectedDate}
-            min={dates[0]}
-            max={dates[dates.length - 1]}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            style={{
-              boxSizing: 'border-box',
-              borderWidth: 2,
-              borderColor: COLORS.light,
-              borderRadius: 12,
-              padding: 14,
-              fontSize: 16,
-              backgroundColor: COLORS.light,
-              color: COLORS.dark,
-              fontWeight: '500',
-              width: '100%',
-              marginBottom: 16,
-              fontFamily: 'inherit',
-            }}
-          />
+          <div style={{ overflowX: 'auto', maxWidth: '100%', marginBottom: 16 }}>
+            <input
+              type="date"
+              lang="de"
+              value={selectedDate}
+              min={dates[0]}
+              max={dates[dates.length - 1]}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              style={{
+                boxSizing: 'border-box',
+                borderWidth: 2,
+                borderColor: COLORS.light,
+                borderRadius: 12,
+                padding: 14,
+                fontSize: 16,
+                backgroundColor: COLORS.light,
+                color: COLORS.dark,
+                fontWeight: '500',
+                width: '100%',
+                fontFamily: 'inherit',
+              }}
+            />
+          </div>
 
           <Text style={styles.label}>Essen</Text>
           <View style={styles.dietaryOptions}>
