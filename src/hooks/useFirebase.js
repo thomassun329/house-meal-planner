@@ -100,3 +100,59 @@ export const useFirebaseMembers = () => {
 
   return { members, memberDietary, loading, addMember, removeMember };
 };
+
+export const useFirebaseGuests = () => {
+  const [guestsByDateMeal, setGuestsByDateMeal] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const guestsRef = collection(db, 'households', HOUSEHOLD_ID, 'guestEntries');
+    const unsubscribe = onSnapshot(
+      guestsRef,
+      (snapshot) => {
+        const data = {};
+        snapshot.forEach((doc) => {
+          const { date, mealType, name } = doc.data();
+          const key = `${date}-${mealType}`;
+          if (!data[key]) data[key] = [];
+          data[key].push(name);
+        });
+        Object.keys(data).forEach((key) => data[key].sort());
+        setGuestsByDateMeal(data);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Error fetching guests:', error);
+        setLoading(false);
+      }
+    );
+    return unsubscribe;
+  }, []);
+
+  const addGuest = async (date, mealType, name) => {
+    const docId = `${date}-${mealType}-${name}`;
+    try {
+      await setDoc(doc(db, 'households', HOUSEHOLD_ID, 'guestEntries', docId), {
+        date,
+        mealType,
+        name,
+        addedAt: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error('Error adding guest:', error);
+      alert('Fehler beim Hinzufügen des Gasts: ' + error.message);
+    }
+  };
+
+  const removeGuest = async (date, mealType, name) => {
+    const docId = `${date}-${mealType}-${name}`;
+    try {
+      await deleteDoc(doc(db, 'households', HOUSEHOLD_ID, 'guestEntries', docId));
+    } catch (error) {
+      console.error('Error removing guest:', error);
+      alert('Fehler beim Entfernen des Gasts: ' + error.message);
+    }
+  };
+
+  return { guestsByDateMeal, loading, addGuest, removeGuest };
+};

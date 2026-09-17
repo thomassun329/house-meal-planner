@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert, Dimensions, Modal } from 'react-native';
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { useFirebaseMeals, useFirebaseMembers, useFirebaseHousehold } from './hooks/useFirebase';
+import { useFirebaseMeals, useFirebaseMembers, useFirebaseHousehold, useFirebaseGuests } from './hooks/useFirebase';
 
 const DIETARY_OPTIONS = ['Normal', 'Vegetarian'];
 
@@ -211,6 +211,111 @@ function MemberManagement({ members, memberDietary, onAddMember, onRemoveMember,
             </View>
           </View>
         </Modal>
+      </ScrollView>
+    </View>
+  );
+}
+
+function ManageGuests({ dates, guestsByDateMeal, onAddGuest, onRemoveGuest, onBack, formatDate }) {
+  const [selectedDate, setSelectedDate] = useState(dates[0]);
+  const [selectedMeal, setSelectedMeal] = useState('lunch');
+  const [newGuestName, setNewGuestName] = useState('');
+
+  const key = `${selectedDate}-${selectedMeal}`;
+  const guestsForSelection = guestsByDateMeal[key] || [];
+
+  const handleAddGuest = () => {
+    const trimmed = newGuestName.trim();
+    if (!trimmed) return;
+    onAddGuest(selectedDate, selectedMeal, trimmed);
+    setNewGuestName('');
+  };
+
+  return (
+    <View style={styles.managementContainer}>
+      <View style={styles.managementHeader}>
+        <TouchableOpacity onPress={onBack}>
+          <Text style={styles.backButton}>← Zurück</Text>
+        </TouchableOpacity>
+        <Text style={styles.managementTitle}>🎉 Gäste verwalten</Text>
+        <View style={{ width: 50 }} />
+      </View>
+
+      <ScrollView style={styles.managementContent} scrollEventThrottle={16}>
+        <View style={styles.addMemberCard}>
+          <Text style={styles.label}>Datum</Text>
+          <input
+            type="date"
+            value={selectedDate}
+            min={dates[0]}
+            max={dates[dates.length - 1]}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            style={{
+              borderWidth: 2,
+              borderColor: COLORS.light,
+              borderRadius: 12,
+              padding: 14,
+              fontSize: 16,
+              backgroundColor: COLORS.light,
+              color: COLORS.dark,
+              fontWeight: '500',
+              width: '100%',
+              marginBottom: 16,
+              fontFamily: 'inherit',
+            }}
+          />
+
+          <Text style={styles.label}>Essen</Text>
+          <View style={styles.dietaryOptions}>
+            {['lunch', 'dinner'].map(meal => (
+              <TouchableOpacity
+                key={meal}
+                style={[styles.dietaryOption, selectedMeal === meal && styles.dietaryOptionActive]}
+                onPress={() => setSelectedMeal(meal)}
+              >
+                <Text style={[styles.dietaryOptionText, selectedMeal === meal && styles.dietaryOptionTextActive]}>
+                  {meal === 'lunch' ? 'Mittag' : 'Abend'}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <Text style={styles.label}>Gastname</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Namen des Gasts eingeben"
+            value={newGuestName}
+            onChangeText={setNewGuestName}
+          />
+
+          <TouchableOpacity style={styles.addButton} onPress={handleAddGuest}>
+            <Text style={styles.addButtonText}>+ Gast hinzufügen</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.membersListCard}>
+          <Text style={styles.membersListTitle}>
+            Gäste für {formatDate(selectedDate)} ({selectedMeal === 'lunch' ? 'Mittag' : 'Abend'})
+          </Text>
+          {guestsForSelection.length === 0 ? (
+            <Text style={styles.infoBullet}>Keine Gäste für diesen Termin</Text>
+          ) : (
+            guestsForSelection.map(name => (
+              <View key={name} style={styles.memberItem}>
+                <View style={styles.memberInfo}>
+                  <Text style={styles.memberName}>{name}</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.removeButton}
+                  activeOpacity={0.6}
+                  onPress={() => onRemoveGuest(selectedDate, selectedMeal, name)}
+                >
+                  <Text style={styles.removeButtonText}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            ))
+          )}
+        </View>
       </ScrollView>
     </View>
   );
@@ -510,6 +615,7 @@ export default function App() {
   // Firebase hooks
   const { meals: fbMeals, loading: fbMealsLoading, saveMeal } = useFirebaseMeals();
   const { members: fbMembers, memberDietary: fbDietary, loading: fbMembersLoading, addMember: fbAddMember, removeMember: fbRemoveMember } = useFirebaseMembers();
+  const { guestsByDateMeal, addGuest, removeGuest } = useFirebaseGuests();
 
   // Auth
   const [name, setName] = useState('');
@@ -680,6 +786,8 @@ export default function App() {
     const parts = [];
     if (summary.Normal > 0) parts.push(`${summary.Normal} normal`);
     if (summary.Vegetarian > 0) parts.push(`${summary.Vegetarian} vegetarisch`);
+    const guestNames = guestsByDateMeal[`${dateStr}-${mealType}`] || [];
+    if (guestNames.length > 0) parts.push(`${guestNames.length} Gast (${guestNames.join(' + ')})`);
     return parts.join(' + ') || 'Keine';
   };
 
@@ -752,6 +860,19 @@ export default function App() {
       );
     }
 
+    if (currentScreen === 'guests') {
+      return (
+        <ManageGuests
+          dates={dates}
+          guestsByDateMeal={guestsByDateMeal}
+          onAddGuest={addGuest}
+          onRemoveGuest={removeGuest}
+          onBack={() => setCurrentScreen('schedule')}
+          formatDate={formatDate}
+        />
+      );
+    }
+
     if (currentScreen === 'settings') {
       return (
         <SettingsScreen
@@ -783,6 +904,9 @@ export default function App() {
               <TouchableOpacity style={styles.adminNavBtn} onPress={() => setCurrentScreen('members')}>
                 <Text style={styles.adminNavBtnText}>Mitglieder</Text>
               </TouchableOpacity>
+              <TouchableOpacity style={styles.adminNavBtn} onPress={() => setCurrentScreen('guests')}>
+                <Text style={styles.adminNavBtnText}>Gäste</Text>
+              </TouchableOpacity>
               <TouchableOpacity style={styles.settingsNavBtn} onPress={() => setCurrentScreen('settings')}>
                 <Text style={styles.settingsNavBtnText}>⚙</Text>
               </TouchableOpacity>
@@ -790,6 +914,9 @@ export default function App() {
           )}
           {!isAdmin && (
             <View style={styles.headerButtonsGroup}>
+              <TouchableOpacity style={styles.adminNavBtn} onPress={() => setCurrentScreen('guests')}>
+                <Text style={styles.adminNavBtnText}>Gäste</Text>
+              </TouchableOpacity>
               <TouchableOpacity style={styles.settingsNavBtn} onPress={() => setCurrentScreen('settings')}>
                 <Text style={styles.settingsNavBtnText}>⚙</Text>
               </TouchableOpacity>
