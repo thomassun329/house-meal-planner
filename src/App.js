@@ -324,7 +324,7 @@ function ManageGuests({ dates, guestsByDateMeal, onAddGuest, onRemoveGuest, onBa
   );
 }
 
-function AdminDashboard({ meals, dates, onBack, members, memberDietary, historicalMembers }) {
+function AdminDashboard({ meals, dates, onBack, members, memberDietary, historicalMembers, guestsByDateMeal }) {
   const [filterYear, setFilterYear] = useState(new Date().getFullYear());
   const [filterMealType, setFilterMealType] = useState('all'); // 'all', 'normal', 'vegetarian'
   const [filterMembers, setFilterMembers] = useState(new Set(['all'])); // Multi-select members
@@ -352,6 +352,12 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
 
   const allMembers = getAllMembers();
 
+  const allGuestNames = (() => {
+    const namesSet = new Set();
+    Object.values(guestsByDateMeal).forEach(names => names.forEach(n => namesSet.add(n)));
+    return Array.from(namesSet).sort();
+  })();
+
   const availableYears = (() => {
     const years = new Set();
     Object.keys(meals).forEach(key => {
@@ -377,7 +383,7 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
       const monthKey = `${yyyy}-${mm}`;
 
       if (!months[monthKey]) {
-        months[monthKey] = { normal: 0, vegetarian: 0 };
+        months[monthKey] = { normal: 0, vegetarian: 0, guest: 0 };
       }
 
       ['lunch', 'dinner'].forEach(mealType => {
@@ -400,15 +406,39 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
             }
           }
         });
+
+        // Guests have no dietary preference, so they only count under "Alle"
+        if (filterMealType === 'all') {
+          const guestNames = guestsByDateMeal[`${dateStr}-${mealType}`] || [];
+          guestNames.forEach(name => {
+            if (filterMembers.has('all') || filterMembers.has(name)) {
+              months[monthKey].guest++;
+            }
+          });
+        }
       });
     }
 
     return months;
   };
 
+  const getGuestBreakdown = () => {
+    const counts = {};
+    Object.entries(guestsByDateMeal).forEach(([key, names]) => {
+      if (parseInt(key.substring(0, 4)) !== filterYear) return;
+      names.forEach(name => {
+        counts[name] = (counts[name] || 0) + 1;
+      });
+    });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => ({ name, count }));
+  };
+
   const monthlyStats = getMonthlyStats();
+  const guestBreakdown = getGuestBreakdown();
   const monthLabels = Object.keys(monthlyStats).sort().filter(m =>
-    monthlyStats[m].normal + monthlyStats[m].vegetarian > 0
+    monthlyStats[m].normal + monthlyStats[m].vegetarian + monthlyStats[m].guest > 0
   );
 
   const chartData = {
@@ -428,12 +458,17 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
         data: monthLabels.map(m => monthlyStats[m].vegetarian),
         color: () => '#8BC34A',
       },
+      {
+        label: 'Gast',
+        data: monthLabels.map(m => monthlyStats[m].guest),
+        color: () => '#f9a620',
+      },
     ],
   };
 
   const maxValue = Math.max(
     ...monthLabels.map(m =>
-      monthlyStats[m].normal + monthlyStats[m].vegetarian
+      monthlyStats[m].normal + monthlyStats[m].vegetarian + monthlyStats[m].guest
     )
   ) || 10;
 
@@ -538,6 +573,31 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
                     <Text style={styles.dropdownItemText}>{member}</Text>
                   </TouchableOpacity>
                 ))}
+
+                {allGuestNames.length > 0 && (
+                  <Text style={styles.dropdownSectionLabel}>Gäste</Text>
+                )}
+                {allGuestNames.map(name => (
+                  <TouchableOpacity
+                    key={`guest-${name}`}
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      const newFilters = new Set(filterMembers);
+                      newFilters.delete('all');
+                      if (newFilters.has(name)) {
+                        newFilters.delete(name);
+                      } else {
+                        newFilters.add(name);
+                      }
+                      setFilterMembers(newFilters.size === 0 ? new Set(['all']) : newFilters);
+                    }}
+                  >
+                    <View style={[styles.checkbox, filterMembers.has(name) && styles.checkboxActive]}>
+                      {filterMembers.has(name) && <Text style={styles.checkmark}>✓</Text>}
+                    </View>
+                    <Text style={styles.dropdownItemText}>🎉 {name}</Text>
+                  </TouchableOpacity>
+                ))}
               </View>
             )}
           </View>
@@ -552,9 +612,11 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
                   const month = monthLabels[idx];
                   const normal = monthlyStats[month].normal;
                   const vegetarian = monthlyStats[month].vegetarian;
-                  const total = normal + vegetarian;
+                  const guest = monthlyStats[month].guest;
+                  const total = normal + vegetarian + guest;
                   const normH = total > 0 ? (normal / maxValue) * 200 : 0;
                   const vegH  = total > 0 ? (vegetarian / maxValue) * 200 : 0;
+                  const guestH = total > 0 ? (guest / maxValue) * 200 : 0;
 
                   return (
                     <View key={idx} style={styles.chartBarCol}>
@@ -564,19 +626,26 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
                           <View style={styles.barFallow} />
                         ) : (
                           <>
+                            {guest > 0 && (
+                              <View style={[styles.barSegment, {
+                                height: guestH,
+                                backgroundColor: COLORS.warning,
+                                borderTopLeftRadius: 5,
+                                borderTopRightRadius: 5,
+                              }]} />
+                            )}
                             {vegetarian > 0 && (
                               <View style={[styles.barSegment, {
                                 height: vegH,
                                 backgroundColor: COLORS.success,
-                                borderTopLeftRadius: 5,
-                                borderTopRightRadius: 5,
+                                ...(guest === 0 && { borderTopLeftRadius: 5, borderTopRightRadius: 5 }),
                               }]} />
                             )}
                             {normal > 0 && (
                               <View style={[styles.barSegment, {
                                 height: normH,
                                 backgroundColor: COLORS.secondary,
-                                ...(vegetarian === 0 && { borderTopLeftRadius: 5, borderTopRightRadius: 5 }),
+                                ...(vegetarian === 0 && guest === 0 && { borderTopLeftRadius: 5, borderTopRightRadius: 5 }),
                               }]} />
                             )}
                           </>
@@ -608,7 +677,23 @@ function AdminDashboard({ meals, dates, onBack, members, memberDietary, historic
             <View style={[styles.legendColor, { backgroundColor: COLORS.success }]} />
             <Text style={styles.legendText}>Vegetarische Portionen</Text>
           </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendColor, { backgroundColor: COLORS.warning }]} />
+            <Text style={styles.legendText}>Gastportionen</Text>
+          </View>
         </View>
+
+        {guestBreakdown.length > 0 && (
+          <View style={styles.statsCard}>
+            <Text style={styles.statsTitle}>Gäste {filterYear}</Text>
+            {guestBreakdown.map(({ name, count }) => (
+              <View key={name} style={styles.legendItem}>
+                <Text style={styles.legendText}>🎉 {name}</Text>
+                <Text style={[styles.legendText, { marginLeft: 'auto', fontWeight: '700' }]}>{count}x</Text>
+              </View>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -841,6 +926,7 @@ export default function App() {
           members={members}
           memberDietary={memberDietary}
           historicalMembers={historicalMembers}
+          guestsByDateMeal={guestsByDateMeal}
           onBack={() => setCurrentScreen('schedule')}
         />
       );
@@ -1212,6 +1298,7 @@ const styles = StyleSheet.create({
   checkboxActive: { backgroundColor: COLORS.success, borderColor: COLORS.success },
   checkmark: { fontSize: 12, color: COLORS.white, fontWeight: 'bold' },
   dropdownItemText: { fontSize: 13, color: COLORS.dark },
+  dropdownSectionLabel: { fontSize: 11, fontWeight: '700', color: COLORS.muted, textTransform: 'uppercase', letterSpacing: 0.5, paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4 },
   settingsContainer: { flex: 1, backgroundColor: COLORS.light },
   settingsHeader: { backgroundColor: COLORS.white, padding: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 32, shadowColor: COLORS.dark, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
   settingsTitle: { fontSize: 22, fontWeight: 'bold', color: COLORS.dark, letterSpacing: -0.3, marginLeft: 16 },
